@@ -109,19 +109,19 @@ export const CompleteWordExercise: React.FC<CompleteWordExerciseProps> = ({ onAn
   const fullSentence = currentQuestion.sentenceHint.replace('___', currentQuestion.correctWord);
 
   return (
-    <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl p-4 sm:p-8">
+    <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl p-4 sm:p-6">
       {/* Progress Bar */}
       <p className="text-slate-500 font-semibold mb-2 text-lg sm:text-xl">
         اَلسُّؤَالُ {currentQuestionIndex + 1} مِنْ {questions.length}
       </p>
-      <div className="h-3 w-full bg-slate-200 rounded-full mb-4 sm:mb-8">
+      <div className="h-3 w-full bg-slate-200 rounded-full mb-4">
           <div className="h-3 bg-emerald-500 rounded-full transition-all duration-300" style={{width: `${((currentQuestionIndex + 1) / questions.length) * 100}%`}}></div>
       </div>
       
-      <h2 className="text-4xl sm:text-5xl font-bold text-slate-700 mb-6 text-center">أَكْمِلِ الْجُمْلَةَ:</h2>
+      <h2 className="text-4xl sm:text-5xl font-bold text-slate-700 mb-4 text-center">أَكْمِلِ الْجُمْلَةَ:</h2>
       
       {/* Display for the sentence hint with a blank space */}
-      <div className="text-center mb-8 bg-slate-100 p-4 sm:p-8 rounded-lg">
+      <div className="text-center mb-6 bg-slate-100 p-4 sm:p-6 rounded-lg">
            <p className="text-4xl sm:text-6xl font-bold text-slate-800 leading-relaxed">
               {currentQuestion.sentenceHint.split('___').map((part, index) => (
                   <React.Fragment key={index}>
@@ -137,7 +137,7 @@ export const CompleteWordExercise: React.FC<CompleteWordExerciseProps> = ({ onAn
       </div>
 
       {/* Options Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mb-6">
         {shuffledOptions.map((option) => (
           <button
             key={option}
@@ -152,14 +152,14 @@ export const CompleteWordExercise: React.FC<CompleteWordExerciseProps> = ({ onAn
 
       {/* Feedback Section */}
       {feedback && (
-        <div className="text-center animate-fade-in mt-4 sm:mt-8 p-4 sm:p-6 bg-slate-50 rounded-lg">
+        <div className="text-center animate-fade-in mt-4 p-4 sm:p-5 bg-slate-50 rounded-lg">
            <p className={`text-3xl sm:text-4xl font-bold mb-4 ${feedback === 'correct' ? 'text-green-600' : 'text-red-600'}`}>
               {feedback === 'correct' ? correctMessage : `لِلْأَسَفِ! اَلْإِجَابَةُ الصَّحِيحَةُ هِيَ "${currentQuestion.correctWord}"`}
            </p>
            <p className="text-3xl sm:text-4xl text-slate-600">اَلْجُمْلَةُ الْكَامِلَةُ: <span className="font-bold text-emerald-600">{fullSentence}</span></p>
            <button 
               onClick={handleNextQuestion} 
-              className="mt-4 sm:mt-6 bg-emerald-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-emerald-600 transition-colors text-xl sm:text-2xl"
+              className="mt-4 bg-emerald-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-emerald-600 transition-colors text-xl sm:text-2xl"
             >
                 اَلسُّؤَالُ التَّالِي
             </button>

@@ -119,20 +119,20 @@ export const WordScrambleExercise: React.FC<WordScrambleExerciseProps> = ({ onAn
   const placeholderCount = Math.max(0, currentQuestion.scrambledLetters.length - builtWord.length);
 
   return (
-    <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-4 sm:p-8 transition-all duration-500">
+    <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-4 sm:p-6 transition-all duration-500">
       {/* Progress Bar */}
       <p className="text-slate-500 font-semibold mb-2 text-lg sm:text-xl">
         اَلسُّؤَالُ {currentQuestionIndex + 1} مِنْ {questions.length}
       </p>
-      <div className="h-3 w-full bg-slate-200 rounded-full mb-4 sm:mb-8">
+      <div className="h-3 w-full bg-slate-200 rounded-full mb-4">
           <div className="h-3 bg-rose-500 rounded-full transition-all duration-300" style={{width: `${((currentQuestionIndex + 1) / questions.length) * 100}%`}}></div>
       </div>
 
       <h2 className="text-4xl sm:text-5xl font-bold text-slate-700 mb-2 text-center">رَتِّبِ الْحُرُوفَ لِتُكَوِّنَ كَلِمَةً:</h2>
-      {currentQuestion.hint && <p className="text-center text-slate-500 mb-4 sm:mb-8 text-xl sm:text-2xl">تَلْمِيحٌ: {currentQuestion.hint}</p>}
+      {currentQuestion.hint && <p className="text-center text-slate-500 mb-4 text-xl sm:text-2xl">تَلْمِيحٌ: {currentQuestion.hint}</p>}
       
       {/* Area where the user builds the word */}
-      <div dir="rtl" className="flex justify-center items-center gap-2 sm:gap-3 mb-8 bg-slate-100 p-2 sm:p-4 rounded-lg min-h-[80px] sm:min-h-[120px]">
+      <div dir="rtl" className="flex justify-center items-center gap-2 sm:gap-3 mb-6 bg-slate-100 p-2 sm:p-4 rounded-lg min-h-[80px] sm:min-h-[120px]">
           {builtWord.map((tile) => (
               <div key={tile.id} className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center bg-white rounded-lg shadow text-4xl sm:text-5xl font-bold text-rose-600">
                   {tile.letter}
@@ -145,7 +145,7 @@ export const WordScrambleExercise: React.FC<WordScrambleExerciseProps> = ({ onAn
       </div>
 
       {/* Area with available letter tiles */}
-      <div dir="rtl" className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8 min-h-[80px] sm:min-h-[120px]">
+      <div dir="rtl" className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-6 min-h-[80px] sm:min-h-[120px]">
         {availableLetters.map((tile) => (
           <button
             key={tile.id}
@@ -173,14 +173,14 @@ export const WordScrambleExercise: React.FC<WordScrambleExerciseProps> = ({ onAn
 
       {/* Feedback Section */}
       {feedback && (
-        <div className="text-center animate-fade-in mt-4 sm:mt-8 p-4 sm:p-6 bg-slate-50 rounded-lg">
+        <div className="text-center animate-fade-in mt-4 p-4 sm:p-5 bg-slate-50 rounded-lg">
            <p className={`text-3xl sm:text-4xl font-bold mb-4 ${feedback === 'correct' ? 'text-green-600' : 'text-red-600'}`}>
               {feedback === 'correct' ? correctMessage : 'خَطَأٌ! حَاوِلْ مَرَّةً أُخْرَى.'}
            </p>
            <p className="text-3xl sm:text-4xl text-slate-600">اَلْكَلِمَةُ الصَّحِيحَةُ هِيَ: <span className="font-bold text-rose-600">{currentQuestion.word}</span></p>
            <button 
               onClick={handleNextQuestion} 
-              className="mt-4 sm:mt-6 bg-rose-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-rose-600 transition-colors text-xl sm:text-2xl"
+              className="mt-4 bg-rose-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-rose-600 transition-colors text-xl sm:text-2xl"
             >
                 اَلسُّؤَالُ التَّالِي
             </button>

@@ -179,31 +179,31 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onAnswer }) => {
     // RENDER LOGIC for intermediary screens.
     if (['start', 'round_complete', 'level_complete', 'game_complete'].includes(gamePhase)) {
         return (
-             <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-8 text-center animate-fade-in">
+             <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6 text-center animate-fade-in">
                 {gamePhase === 'start' && <>
                     <h2 className="text-4xl font-bold text-slate-700 mb-2">تَحَدِّي الذَّاكِرَةِ</h2>
-                    <p className="text-2xl text-slate-500 mb-8">أَكْمِلْ {ROUNDS_PER_LEVEL} تَمَارِينَ فِي كُلِّ مُسْتَوًى لِتَتَقَدَّمَ.</p>
+                    <p className="text-2xl text-slate-500 mb-6">أَكْمِلْ {ROUNDS_PER_LEVEL} تَمَارِينَ فِي كُلِّ مُسْتَوًى لِتَتَقَدَّمَ.</p>
                     <button onClick={() => setupRound(1)} className="w-full text-white font-bold py-4 px-8 rounded-full text-2xl hover:scale-105 transition-transform bg-amber-500 hover:bg-amber-600">
                         اِبْدَأِ التَّحَدِّي
                     </button>
                 </>}
                 {gamePhase === 'round_complete' && <>
                     <h2 className="text-4xl font-bold text-green-600 mb-2">✔️ تَمْرِينٌ مُكْتَمِلٌ ✔️</h2>
-                    <p className="text-2xl text-slate-500 mb-6">أَحْسَنْتَ! أَكْمَلْتَ التَّمْرِينَ فِي <span className="font-bold text-slate-700">{moves}</span> حَرَكَاتٍ.</p>
+                    <p className="text-2xl text-slate-500 mb-4">أَحْسَنْتَ! أَكْمَلْتَ التَّمْرِينَ فِي <span className="font-bold text-slate-700">{moves}</span> حَرَكَاتٍ.</p>
                     <button onClick={handleNextRound} className="w-full text-white font-bold py-4 px-8 rounded-full text-2xl hover:scale-105 transition-transform bg-amber-500 hover:bg-amber-600">
                         التَّمْرِينُ التَّالِي
                     </button>
                 </>}
                 {gamePhase === 'level_complete' && <>
                     <h2 className="text-4xl font-bold text-green-600 mb-2">🎉 مُسْتَوًى مُكْتَمِلٌ! 🎉</h2>
-                    <p className="text-2xl text-slate-500 mb-6">لَقَدْ أَكْمَلْتَ الْمُسْتَوَى {currentLevel}! هَلْ أَنْتَ مُسْتَعِدٌّ لِلْمُسْتَوَى التَّالِي؟</p>
+                    <p className="text-2xl text-slate-500 mb-4">لَقَدْ أَكْمَلْتَ الْمُسْتَوَى {currentLevel}! هَلْ أَنْتَ مُسْتَعِدٌّ لِلْمُسْتَوَى التَّالِي؟</p>
                     <button onClick={handleNextLevel} className="w-full text-white font-bold py-4 px-8 rounded-full text-2xl hover:scale-105 transition-transform bg-amber-500 hover:bg-amber-600">
                         الْمُسْتَوَى التَّالِي
                     </button>
                 </>}
                  {gamePhase === 'game_complete' && <>
                     <h2 className="text-4xl font-bold text-green-600 mb-2">🏆 اكْتَمَلَ التَّحَدِّي 🏆</h2>
-                    <p className="text-2xl text-slate-500 mb-6">لَقَدْ أَظْهَرْتَ ذَاكِرَةً قَوِيَّةً! عَمَلٌ رَائِعٌ!</p>
+                    <p className="text-2xl text-slate-500 mb-4">لَقَدْ أَظْهَرْتَ ذَاكِرَةً قَوِيَّةً! عَمَلٌ رَائِعٌ!</p>
                     <button onClick={handleRestart} className="w-full text-white font-bold py-4 px-8 rounded-full text-2xl hover:scale-105 transition-transform bg-amber-500 hover:bg-amber-600">
                         الْعَبْ مَرَّةً أُخْرَى
                     </button>
@@ -214,8 +214,8 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onAnswer }) => {
 
     // RENDER LOGIC for the main game board.
     return (
-        <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl p-4 sm:p-8">
-            <div className="text-center mb-4">
+        <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl p-4 sm:p-6">
+            <div className="text-center mb-3">
                 {gamePhase === 'study' ? (
                     <div className="animate-fade-in">
                         <h2 className="text-3xl font-bold text-slate-700">مَرْحَلَةُ الدِّرَاسَةِ (الْمُسْتَوَى {currentLevel} - تَمْرِينٌ {currentRound}/{ROUNDS_PER_LEVEL})</h2>
@@ -229,7 +229,7 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onAnswer }) => {
                 )}
             </div>
             
-            <div className={`grid gap-2 sm:gap-5 justify-center ${levelConfig.gridCols}`}>
+            <div className={`grid gap-2 sm:gap-4 justify-center ${levelConfig.gridCols}`}>
                 {cards.map((card) => (
                     <div
                         key={card.instanceId}

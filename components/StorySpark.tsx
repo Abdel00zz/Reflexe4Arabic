@@ -51,14 +51,14 @@ export const StorySpark: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center p-4 sm:p-8">
-            <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-6 sm:p-8 text-center">
+        <div className="flex flex-col items-center p-4 sm:p-6">
+            <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-6 text-center">
                 <div className="text-4xl sm:text-5xl mb-4">✨</div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-slate-700 mb-2">شَرَارَةُ الْقِصَصِ</h2>
-                <p className="text-lg sm:text-xl text-slate-500 mb-8">اِخْتَرْ بَعْضَ الْكَلِمَاتِ، وَدَعِ الذَّكَاءَ الاِصْطِنَاعِيَّ يَنْسُجْ لَكَ قِصَّةً قَصِيرَةً!</p>
+                <p className="text-lg sm:text-xl text-slate-500 mb-6">اِخْتَرْ بَعْضَ الْكَلِمَاتِ، وَدَعِ الذَّكَاءَ الاِصْطِنَاعِيَّ يَنْسُجْ لَكَ قِصَّةً قَصِيرَةً!</p>
 
                 {/* Word selection buttons */}
-                <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8">
+                <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-6">
                     {storyWords.map((item: StoryWord) => (
                         <button
                             key={item.id}
@@ -84,7 +84,7 @@ export const StorySpark: React.FC = () => {
 
                 {/* Loading Indicator */}
                 {isLoading && (
-                    <div className="mt-8">
+                    <div className="mt-6">
                         <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-4 border-violet-500 mx-auto"></div>
                         <p className="text-slate-500 mt-4">لَحَظَاتٍ مِنْ فَضْلِكَ، اَلْإِبْدَاعُ يَحْتَاجُ وَقْتًا...</p>
                     </div>
@@ -92,7 +92,7 @@ export const StorySpark: React.FC = () => {
 
                 {/* Display Generated Story */}
                 {generatedStory && !isLoading && (
-                    <div className="mt-8 p-4 sm:p-6 bg-violet-50 rounded-xl border-2 border-violet-200 animate-fade-in">
+                    <div className="mt-6 p-4 sm:p-6 bg-violet-50 rounded-xl border-2 border-violet-200 animate-fade-in">
                         <h3 className="text-xl sm:text-2xl font-bold text-violet-800 mb-4">قِصَّتُكَ الصَّغِيرَةُ:</h3>
                         <p className="text-lg sm:text-xl text-slate-700 leading-relaxed">{generatedStory}</p>
                     </div>

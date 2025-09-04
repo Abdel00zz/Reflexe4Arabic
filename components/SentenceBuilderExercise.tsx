@@ -8,6 +8,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { SentenceQuestion } from '../types';
 import { sentenceQuestions } from '../data/arabicContent';
 import { playCorrectSound, playIncorrectSound } from '../utils/sounds';
+import { BsBackspaceFill } from 'react-icons/bs';
 
 // Props interface for the component.
 interface SentenceBuilderExerciseProps {
@@ -38,6 +39,8 @@ export const SentenceBuilderExercise: React.FC<SentenceBuilderExerciseProps> = (
   const [builtSentence, setBuiltSentence] = useState<WordTile[]>([]);
   // State for providing feedback to the user.
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
+  // State for the currently selected tile in the built sentence for swapping.
+  const [selectedTile, setSelectedTile] = useState<WordTile | null>(null);
   
   // Effect to load and shuffle questions on component mount.
   useEffect(() => {
@@ -54,6 +57,7 @@ export const SentenceBuilderExercise: React.FC<SentenceBuilderExerciseProps> = (
       setAvailableWords(shuffleArray(initialTiles));
       setBuiltSentence([]);
       setFeedback(null);
+      setSelectedTile(null);
     }
   }, [currentQuestion]);
 
@@ -68,14 +72,58 @@ export const SentenceBuilderExercise: React.FC<SentenceBuilderExerciseProps> = (
   };
   
   /**
-   * Moves a word from the built sentence back to the available pool.
-   * @param {WordTile} tile - The word tile to remove from the sentence.
+   * Handles clicking a word in the built sentence area for selection and swapping.
+   * @param {WordTile} clickedTile - The word tile that was clicked.
    */
-  const handleRemoveWord = (tile: WordTile) => {
+  const handleBuiltWordClick = (clickedTile: WordTile) => {
     if (feedback) return;
-    setAvailableWords(prev => [...prev, tile]);
-    setBuiltSentence(prev => prev.filter(t => t.id !== tile.id));
-  }
+
+    if (!selectedTile) {
+      // Nothing selected, so select this tile.
+      setSelectedTile(clickedTile);
+    } else {
+      if (selectedTile.id === clickedTile.id) {
+        // Clicked the same tile, so deselect.
+        setSelectedTile(null);
+      } else {
+        // Clicked a different tile, so swap them.
+        const newBuiltSentence = [...builtSentence];
+        const fromIndex = builtSentence.findIndex(t => t.id === selectedTile.id);
+        const toIndex = builtSentence.findIndex(t => t.id === clickedTile.id);
+        
+        if (fromIndex !== -1 && toIndex !== -1) {
+          // Perform the swap.
+          [newBuiltSentence[fromIndex], newBuiltSentence[toIndex]] = [newBuiltSentence[toIndex], newBuiltSentence[fromIndex]];
+          setBuiltSentence(newBuiltSentence);
+        }
+        // Deselect after swap.
+        setSelectedTile(null);
+      }
+    }
+  };
+
+  /**
+   * Removes a word from the sentence. If a word is selected, it removes that one.
+   * Otherwise, it removes the last word.
+   */
+  const handleBackspace = () => {
+    if (feedback || builtSentence.length === 0) return;
+    
+    let wordToRemove: WordTile | undefined;
+    
+    if (selectedTile) {
+      wordToRemove = selectedTile;
+      setBuiltSentence(prev => prev.filter(t => t.id !== selectedTile.id));
+      setSelectedTile(null);
+    } else {
+      wordToRemove = builtSentence[builtSentence.length - 1];
+      setBuiltSentence(prev => prev.slice(0, -1));
+    }
+    
+    if (wordToRemove) {
+      setAvailableWords(prev => [...prev, wordToRemove!]);
+    }
+  };
 
   /**
    * Checks if the constructed sentence is correct.
@@ -91,6 +139,7 @@ export const SentenceBuilderExercise: React.FC<SentenceBuilderExerciseProps> = (
         playIncorrectSound();
         onAnswer(false, -0.5);
     }
+    setSelectedTile(null); // Deselect on submission.
   }
 
   /**
@@ -110,28 +159,53 @@ export const SentenceBuilderExercise: React.FC<SentenceBuilderExerciseProps> = (
   }
 
   return (
-    <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl p-4 sm:p-8 transition-all duration-500">
+    <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl p-4 sm:p-6 transition-all duration-500">
       {/* Progress Bar */}
       <p className="text-slate-500 font-semibold mb-2 text-lg sm:text-xl">
         اَلسُّؤَالُ {currentQuestionIndex + 1} مِنْ {questions.length}
       </p>
-      <div className="h-3 w-full bg-slate-200 rounded-full mb-4 sm:mb-8">
+      <div className="h-3 w-full bg-slate-200 rounded-full mb-4">
           <div className="h-3 bg-indigo-500 rounded-full transition-all duration-300" style={{width: `${((currentQuestionIndex + 1) / questions.length) * 100}%`}}></div>
       </div>
 
-      <h2 className="text-4xl sm:text-5xl font-bold text-slate-700 mb-8 text-center">رَتِّبِ الْكَلِمَاتِ لِتُكَوِّنَ جُمْلَةً مُفِيدَةً:</h2>
+      <h2 className="text-4xl sm:text-5xl font-bold text-slate-700 mb-6 text-center">رَتِّبِ الْكَلِمَاتِ لِتُكَوِّنَ جُمْلَةً مُفِيدَةً:</h2>
       
-      {/* Area where the user builds the sentence */}
-      <div dir="rtl" className="flex flex-wrap justify-center items-center gap-2 sm:gap-4 mb-8 bg-slate-100 p-4 sm:p-6 rounded-lg min-h-[120px] border-2 border-dashed">
-          {builtSentence.map((tile) => (
-              <button key={tile.id} onClick={() => handleRemoveWord(tile)} className="px-4 py-2 sm:px-6 sm:py-3 bg-white rounded-lg shadow text-2xl sm:text-3xl font-bold text-indigo-600 cursor-pointer">
-                  {tile.word}
-              </button>
-          ))}
+      {/* Area where the user builds the sentence + Backspace button */}
+      <div className="flex items-center gap-4 mb-6">
+        <button 
+            onClick={handleBackspace} 
+            disabled={feedback !== null || builtSentence.length === 0} 
+            className="flex-shrink-0 w-24 h-24 flex items-center justify-center bg-slate-200 text-slate-600 rounded-xl shadow-md hover:bg-slate-300 transition-colors disabled:opacity-50"
+            data-tooltip-id="app-tooltip"
+            data-tooltip-content="إِلْغَاءُ كَلِمَةٍ"
+            aria-label="إِلْغَاءُ كَلِمَةٍ"
+        >
+            <BsBackspaceFill className="h-10 w-10" />
+        </button>
+        <div dir="rtl" className="flex-grow flex flex-wrap justify-center items-center gap-2 sm:gap-4 bg-slate-100 p-4 sm:p-6 rounded-lg min-h-[120px] border-2 border-dashed">
+            {builtSentence.length > 0 ? (
+              builtSentence.map((tile) => (
+                  <button 
+                    key={tile.id} 
+                    onClick={() => handleBuiltWordClick(tile)} 
+                    className={`px-4 py-2 sm:px-6 sm:py-3 rounded-lg shadow text-2xl sm:text-3xl font-bold transition-all duration-200 ${
+                        selectedTile?.id === tile.id 
+                        ? 'bg-yellow-300 text-yellow-900 ring-4 ring-yellow-400 scale-105' 
+                        : 'bg-white text-indigo-600 cursor-pointer'
+                    }`}
+                  >
+                      {tile.word}
+                  </button>
+              ))
+            ) : (
+              <span className="text-slate-400 text-xl font-semibold">اِبْدَأْ بِبِنَاءِ جُمْلَتِكَ هُنَا</span>
+            )}
+        </div>
       </div>
 
+
       {/* Area with available word tiles */}
-      <div dir="rtl" className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8 min-h-[120px]">
+      <div dir="rtl" className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-4 min-h-[120px]">
         {availableWords.map((tile) => (
           <button
             key={tile.id}
@@ -144,25 +218,27 @@ export const SentenceBuilderExercise: React.FC<SentenceBuilderExerciseProps> = (
         ))}
       </div>
 
-        {/* Check Answer Button (appears when all words are used) */}
-        {!feedback && availableWords.length === 0 && (
-             <div className="text-center">
-                 <button onClick={checkAnswer} className="bg-indigo-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-indigo-600 transition-colors text-xl sm:text-2xl">
-                    تَحَقَّقْ مِنَ الْإِجَابَةِ
-                </button>
-            </div>
-        )}
+      {/* Action Button: Check Answer */}
+      <div className="flex justify-center mt-4">
+        <button 
+            onClick={checkAnswer} 
+            disabled={feedback !== null || availableWords.length > 0}
+            className="bg-indigo-500 text-white font-bold py-3 px-8 rounded-full hover:bg-indigo-600 transition-colors text-xl sm:text-2xl disabled:bg-slate-300 disabled:cursor-not-allowed"
+        >
+            تَحَقَّقْ مِنَ الْإِجَابَةِ
+        </button>
+      </div>
 
       {/* Feedback Section */}
       {feedback && (
-        <div className="text-center animate-fade-in mt-4 sm:mt-8 p-4 sm:p-6 bg-slate-50 rounded-lg">
+        <div className="text-center animate-fade-in mt-4 p-4 sm:p-5 bg-slate-50 rounded-lg">
            <p className={`text-3xl sm:text-4xl font-bold mb-4 ${feedback === 'correct' ? 'text-green-600' : 'text-red-600'}`}>
               {feedback === 'correct' ? correctMessage : 'حَاوِلْ مَرَّةً أُخْرَى!'}
            </p>
            <p className="text-3xl sm:text-4xl text-slate-600">اَلْجُمْلَةُ الصَّحِيحَةُ هِيَ: <span className="font-bold text-indigo-600">{currentQuestion.correctSentence}</span></p>
            <button 
               onClick={handleNextQuestion} 
-              className="mt-4 sm:mt-6 bg-indigo-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-indigo-600 transition-colors text-xl sm:text-2xl"
+              className="mt-4 bg-indigo-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-indigo-600 transition-colors text-xl sm:text-2xl"
             >
                 اَلسُّؤَالُ التَّالِي
             </button>

@@ -25,7 +25,7 @@ interface ActivityShellProps {
 export const ActivityShell: React.FC<ActivityShellProps> = ({ score, onBackToMenu, children }) => {
   return (
     // Main container that centers the content and fills the screen.
-    <div className="flex flex-col items-center justify-center min-h-screen p-2 sm:p-4 md:p-8 relative">
+    <div className="flex flex-col items-center justify-center min-h-screen p-2 sm:p-4 md:p-6 relative">
         {/* Score display, positioned at the top-left. Made responsive. */}
         <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-50">
             <div className="flex items-center gap-2 sm:gap-3 bg-yellow-100 text-yellow-800 font-bold px-3 py-2 sm:px-5 sm:py-3 rounded-full shadow-md">

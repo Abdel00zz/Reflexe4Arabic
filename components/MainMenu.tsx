@@ -30,12 +30,12 @@ const menuItems = [
 export const MainMenu: React.FC<MainMenuProps> = ({ onSelectActivity, onOpenHelp, onOpenResults }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
             <h1 className="text-5xl sm:text-7xl font-black text-cyan-600 mb-2">مُغَامَرَةُ تَعَلُّمِ الْعَرَبِيَّةِ</h1>
             <p className="text-xl sm:text-2xl text-slate-500">اِخْتَرْ لُعْبَةً وَابْدَأِ التَّعَلُّمَ!</p>
         </div>
 
-        <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+        <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-6">
             {menuItems.map(item => (
                 <button
                     key={item.type}

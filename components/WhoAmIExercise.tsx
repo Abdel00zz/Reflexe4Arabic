@@ -122,28 +122,28 @@ export const WhoAmIExercise: React.FC<WhoAmIExerciseProps> = ({ onAnswer }) => {
   }
 
   return (
-    <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-4 sm:p-8 transition-all duration-500">
+    <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-4 sm:p-6 transition-all duration-500">
       {/* Progress Bar */}
       <p className="text-slate-500 font-semibold mb-2 text-lg sm:text-xl">
         اَللُّغْزُ {currentQuestionIndex + 1} مِنْ {questions.length}
       </p>
-      <div className="h-3 w-full bg-slate-200 rounded-full mb-4 sm:mb-8">
+      <div className="h-3 w-full bg-slate-200 rounded-full mb-4">
         <div className="h-3 bg-teal-500 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}></div>
       </div>
 
-      <h2 className="text-4xl sm:text-5xl font-bold text-slate-700 mb-6 text-center">مَنْ أَكُونُ؟</h2>
+      <h2 className="text-4xl sm:text-5xl font-bold text-slate-700 mb-4 text-center">مَنْ أَكُونُ؟</h2>
       
-      <div className="bg-slate-100 p-6 sm:p-8 rounded-lg mb-6">
+      <div className="bg-slate-100 p-6 rounded-lg mb-4">
         <p className="text-3xl sm:text-4xl font-semibold text-slate-800 text-center leading-relaxed">{currentQuestion.riddle}</p>
       </div>
 
       {feedback === 'correct' ? (
-        <div className="text-center animate-fade-in mt-4 sm:mt-8 p-4 sm:p-6 bg-green-50 rounded-lg">
+        <div className="text-center animate-fade-in mt-4 p-4 sm:p-5 bg-green-50 rounded-lg">
             <p className="text-3xl sm:text-4xl font-bold mb-4 text-green-600">{correctMessage}</p>
             <p className="text-3xl sm:text-4xl text-slate-600">اَلْإِجَابَةُ هِيَ: <span className="font-bold text-teal-600">{currentQuestion.answer}</span></p>
             <button 
               onClick={handleNextQuestion} 
-              className="mt-6 bg-teal-500 text-white font-bold py-3 px-8 rounded-full hover:bg-teal-600 transition-colors text-2xl" 
+              className="mt-4 bg-teal-500 text-white font-bold py-3 px-8 rounded-full hover:bg-teal-600 transition-colors text-2xl" 
             >
                 اَللُّغْزُ التَّالِي
             </button>
@@ -170,7 +170,7 @@ export const WhoAmIExercise: React.FC<WhoAmIExerciseProps> = ({ onAnswer }) => {
             </div>
         ) : (
             <div className="animate-fade-in">
-                <p className="text-center font-semibold text-slate-600 mb-4 text-xl">أَوِ اخْتَرْ مِنَ الاِقْتِرَاحَاتِ التَّالِيَةِ:</p>
+                <p className="text-center font-semibold text-slate-600 mb-3 text-xl">أَوِ اخْتَرْ مِنَ الاِقْتِرَاحَاتِ التَّالِيَةِ:</p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {shuffledOptions.map(option => (
                         <button 
