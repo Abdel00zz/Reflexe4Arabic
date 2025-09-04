@@ -82,12 +82,11 @@ export const WhoAmIExercise: React.FC<WhoAmIExerciseProps> = ({ onAnswer }) => {
     if (normalize(answer.trim()) === normalize(currentQuestion.answer)) {
       setFeedback('correct');
       playCorrectSound();
-      // More points if answered before suggestions appear
-      onAnswer(true, showSuggestions ? 10 : 20);
+      onAnswer(true, 1);
     } else {
       setFeedback('incorrect');
       playIncorrectSound();
-      onAnswer(false, 0);
+      onAnswer(false, -0.5);
       setTimeout(() => setFeedback(null), 1500); // Reset feedback to allow another try
     }
   };
@@ -141,7 +140,6 @@ export const WhoAmIExercise: React.FC<WhoAmIExerciseProps> = ({ onAnswer }) => {
       {feedback === 'correct' ? (
         <div className="text-center animate-fade-in mt-4 sm:mt-8 p-4 sm:p-6 bg-green-50 rounded-lg">
             <p className="text-3xl sm:text-4xl font-bold mb-4 text-green-600">{correctMessage}</p>
-            <img src={currentQuestion.image} alt={currentQuestion.answer} className="mx-auto my-4 rounded-lg shadow-lg max-h-60" />
             <p className="text-3xl sm:text-4xl text-slate-600">اَلْإِجَابَةُ هِيَ: <span className="font-bold text-teal-600">{currentQuestion.answer}</span></p>
             <button 
               onClick={handleNextQuestion} 

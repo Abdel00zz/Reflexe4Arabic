@@ -85,11 +85,11 @@ export const SentenceBuilderExercise: React.FC<SentenceBuilderExerciseProps> = (
     if (userAnswer === currentQuestion.correctSentence) {
         setFeedback('correct');
         playCorrectSound();
-        onAnswer(true, 25);
+        onAnswer(true, 1);
     } else {
         setFeedback('incorrect');
         playIncorrectSound();
-        onAnswer(false, 0);
+        onAnswer(false, -0.5);
     }
   }
 

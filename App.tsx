@@ -18,6 +18,7 @@ import { MatchingGame } from './components/MatchingGame';
 import { WordScrambleExercise } from './components/WordScrambleExercise';
 import { WhoAmIExercise } from './components/WhoAmIExercise';
 import { SentenceBuilderExercise } from './components/SentenceBuilderExercise';
+import { CrosswordExercise } from './components/CrosswordExercise';
 
 const App: React.FC = () => {
   // State to manage the currently active screen/activity. Defaults to the main menu.
@@ -50,7 +51,7 @@ const App: React.FC = () => {
    * Updates the detailed results based on the user's answer in an exercise.
    * @param {ActivityType} activityType - The type of activity being played.
    * @param {boolean} isCorrect - Whether the user's answer was correct.
-   * @param {number} points - The number of points to add to the score if correct.
+   * @param {number} points - The number of points to add or subtract.
    */
   const handleAnswer = useCallback((activityType: ActivityType, isCorrect: boolean, points: number) => {
       setDetailedResults(prev => {
@@ -60,9 +61,16 @@ const App: React.FC = () => {
           
           if (isCorrect) {
               currentActivityResults.correct += 1;
-              currentActivityResults.score += points;
           } else {
               currentActivityResults.incorrect += 1;
+          }
+          
+          // Add or subtract points.
+          currentActivityResults.score += points;
+
+          // To avoid discouraging the user, an activity's score cannot be negative.
+          if (currentActivityResults.score < 0) {
+            currentActivityResults.score = 0;
           }
           
           newResults[activityType] = currentActivityResults;

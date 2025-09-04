@@ -87,11 +87,11 @@ export const WordScrambleExercise: React.FC<WordScrambleExerciseProps> = ({ onAn
       if (constructedWord === currentQuestion.word) {
         setFeedback('correct');
         playCorrectSound();
-        onAnswer(true, 15);
+        onAnswer(true, 1);
       } else {
         setFeedback('incorrect');
         playIncorrectSound();
-        onAnswer(false, 0);
+        onAnswer(false, -0.5);
       }
     }
   }, [builtWord, currentQuestion, onAnswer, feedback]);

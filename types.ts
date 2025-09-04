@@ -39,10 +39,12 @@ export interface WordQuestion {
 
 /**
  * Interface for a single item in the "Matching Game" (Memory Cards).
+ * Now includes an emoji to match with the word.
  */
 export interface MatchingPair {
   id: number; // Unique ID for the pair type.
   word: string; // The word on the card.
+  emoji: string; // The corresponding emoji.
 }
 
 /**
@@ -73,7 +75,6 @@ export interface WhoAmIQuestion {
   riddle: string;
   answer: string;
   options: string[];
-  image: string; // URL for the answer's image
 }
 
 // FIX: Add missing CrosswordClue interface for the CrosswordExercise component.

@@ -57,11 +57,11 @@ export const CompleteLetterExercise: React.FC<CompleteLetterExerciseProps> = ({ 
     if (option === currentQuestion.correctLetter) {
       setFeedback('correct');
       playCorrectSound();
-      onAnswer(true, 10); // Report correct answer and award points.
+      onAnswer(true, 1); // Report correct answer and award 1 point.
     } else {
       setFeedback('incorrect');
       playIncorrectSound();
-      onAnswer(false, 0); // Report incorrect answer.
+      onAnswer(false, -0.5); // Report incorrect answer and subtract 0.5 points.
     }
   };
 

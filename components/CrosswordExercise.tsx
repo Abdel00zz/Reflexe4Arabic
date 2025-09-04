@@ -89,7 +89,7 @@ export const CrosswordExercise: React.FC<CrosswordExerciseProps> = ({ onAnswer }
           if (word === clue.answer) {
               if (!completedClues.includes(clue.number)) {
                   playCorrectSound();
-                  onAnswer(true, 10);
+                  onAnswer(true, 1);
                   setCompletedClues(prev => [...prev, clue.number]);
                   // Lock the cells
                   const newLocked = [...locked];
@@ -102,7 +102,7 @@ export const CrosswordExercise: React.FC<CrosswordExerciseProps> = ({ onAnswer }
               }
           } else {
               playIncorrectSound();
-              onAnswer(false, 0);
+              onAnswer(false, -0.5);
           }
       }
   };
