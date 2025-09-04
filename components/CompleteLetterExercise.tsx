@@ -6,10 +6,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { LetterQuestion } from '../types';
 import { letterQuestions } from '../data/arabicContent';
+import { playCorrectSound, playIncorrectSound } from '../utils/sounds';
 
 // Props interface for the component.
 interface CompleteLetterExerciseProps {
-  onComplete: (score: number) => void; // Callback to update the total score.
+  onAnswer: (isCorrect: boolean, score: number) => void; // Callback to report answer status and score.
 }
 
 // A utility function to shuffle an array.
@@ -17,7 +18,9 @@ const shuffleArray = <T,>(array: T[]): T[] => {
   return [...array].sort(() => Math.random() - 0.5);
 };
 
-export const CompleteLetterExercise: React.FC<CompleteLetterExerciseProps> = ({ onComplete }) => {
+const correctFeedbackMessages = ['إِجَابَةٌ صَحِيحَةٌ! 🎉', 'أَحْسَنْتَ! 👍', 'عَمَلٌ رَائِعٌ! ✨', 'مُمْتَازٌ! ⭐'];
+
+export const CompleteLetterExercise: React.FC<CompleteLetterExerciseProps> = ({ onAnswer }) => {
   // State to hold the shuffled list of questions.
   const [questions, setQuestions] = useState<LetterQuestion[]>([]);
   // State to track the index of the current question.
@@ -38,6 +41,9 @@ export const CompleteLetterExercise: React.FC<CompleteLetterExerciseProps> = ({ 
   const shuffledOptions = useMemo(() => {
       return currentQuestion ? shuffleArray(currentQuestion.options) : [];
   }, [currentQuestion]);
+  // useMemo to get a random positive feedback message for each question.
+  const correctMessage = useMemo(() => correctFeedbackMessages[Math.floor(Math.random() * correctFeedbackMessages.length)], [currentQuestionIndex]);
+
 
   /**
    * Handles the user clicking on an option button.
@@ -50,9 +56,12 @@ export const CompleteLetterExercise: React.FC<CompleteLetterExerciseProps> = ({ 
     setSelectedOption(option);
     if (option === currentQuestion.correctLetter) {
       setFeedback('correct');
-      onComplete(10); // Award points for correct answer.
+      playCorrectSound();
+      onAnswer(true, 10); // Report correct answer and award points.
     } else {
       setFeedback('incorrect');
+      playIncorrectSound();
+      onAnswer(false, 0); // Report incorrect answer.
     }
   };
 
@@ -103,23 +112,23 @@ export const CompleteLetterExercise: React.FC<CompleteLetterExerciseProps> = ({ 
   return (
     <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-4 sm:p-8 transition-all duration-500">
       {/* Progress Bar */}
-      <p className="text-slate-500 font-semibold mb-2 text-sm sm:text-base">
+      <p className="text-slate-500 font-semibold mb-2 text-lg sm:text-xl">
         اَلسُّؤَالُ {currentQuestionIndex + 1} مِنْ {questions.length}
       </p>
       <div className="h-3 w-full bg-slate-200 rounded-full mb-4 sm:mb-8">
           <div className="h-3 bg-sky-500 rounded-full transition-all duration-300" style={{width: `${((currentQuestionIndex + 1) / questions.length) * 100}%`}}></div>
       </div>
 
-      <h2 className="text-3xl sm:text-4xl font-bold text-slate-700 mb-4 sm:mb-8 text-center">أَكْمِلِ الْكَلِمَةَ:</h2>
+      <h2 className="text-4xl sm:text-5xl font-bold text-slate-700 mb-4 sm:mb-8 text-center">أَكْمِلِ الْكَلِمَةَ:</h2>
       
       {/* Display for the word hint with a blank space */}
       <div className="flex justify-center items-center mb-6 sm:mb-10">
-          <p className="text-5xl sm:text-8xl font-black text-slate-800 tracking-widest bg-slate-100 p-4 sm:p-8 rounded-lg">
+          <p className="text-6xl sm:text-8xl font-black text-slate-800 tracking-widest bg-slate-100 p-4 sm:p-8 rounded-lg">
               {currentQuestion.wordHint.split('_').map((part, index) => (
                   <React.Fragment key={index}>
                       {part}
                       {index < currentQuestion.wordHint.split('_').length - 1 && (
-                          <span className={`inline-block w-16 sm:w-24 text-center border-b-8 ${feedback ? 'border-sky-500' : 'border-slate-300'}`}>
+                          <span className={`inline-block w-20 sm:w-28 text-center border-b-8 ${feedback ? 'border-sky-500' : 'border-slate-300'}`}>
                               {feedback === 'correct' ? selectedOption : feedback === 'incorrect' ? <span className="text-red-500">{selectedOption}</span> : '?'}
                           </span>
                       )}
@@ -135,7 +144,7 @@ export const CompleteLetterExercise: React.FC<CompleteLetterExerciseProps> = ({ 
             key={option}
             onClick={() => handleOptionClick(option)}
             disabled={!!feedback}
-            className={`p-4 sm:p-6 text-3xl sm:text-5xl font-bold rounded-xl shadow-md transition-all duration-300 border-4 ${getButtonClass(option)}`}
+            className={`p-4 sm:p-6 text-4xl sm:text-6xl font-bold rounded-xl shadow-md transition-all duration-300 border-4 ${getButtonClass(option)}`}
           >
             {option}
           </button>
@@ -145,13 +154,13 @@ export const CompleteLetterExercise: React.FC<CompleteLetterExerciseProps> = ({ 
       {/* Feedback Section */}
       {feedback && (
         <div className="text-center animate-fade-in mt-4 sm:mt-8 p-4 sm:p-6 bg-slate-50 rounded-lg">
-           <p className={`text-2xl sm:text-3xl font-bold mb-4 ${feedback === 'correct' ? 'text-green-600' : 'text-red-600'}`}>
-              {feedback === 'correct' ? 'إِجَابَةٌ صَحِيحَةٌ! 🎉' : `خَطَأٌ! اَلْإِجَابَةُ الصَّحِيحَةُ هِيَ "${currentQuestion.correctLetter}"`}
+           <p className={`text-3xl sm:text-4xl font-bold mb-4 ${feedback === 'correct' ? 'text-green-600' : 'text-red-600'}`}>
+              {feedback === 'correct' ? correctMessage : `خَطَأٌ! اَلْإِجَابَةُ الصَّحِيحَةُ هِيَ "${currentQuestion.correctLetter}"`}
            </p>
-           <p className="text-2xl sm:text-3xl text-slate-600">اَلْكَلِمَةُ هِيَ: <span className="font-bold text-sky-600">{fullWord}</span></p>
+           <p className="text-3xl sm:text-4xl text-slate-600">اَلْكَلِمَةُ هِيَ: <span className="font-bold text-sky-600">{fullWord}</span></p>
             <button 
               onClick={handleNextQuestion} 
-              className="mt-4 sm:mt-6 bg-sky-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-sky-600 transition-colors text-lg sm:text-xl" 
+              className="mt-4 sm:mt-6 bg-sky-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-sky-600 transition-colors text-xl sm:text-2xl" 
             >
                 اَلسُّؤَالُ التَّالِي
             </button>

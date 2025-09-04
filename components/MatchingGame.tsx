@@ -6,10 +6,11 @@
 import React, { useState, useEffect } from 'react';
 import { MatchingPair } from '../types';
 import { matchingPairs } from '../data/arabicContent';
+import { playCorrectSound, playIncorrectSound } from '../utils/sounds';
 
 // Props interface for the component.
 interface MatchingGameProps {
-  onComplete: (score: number) => void; // Callback to update the total score.
+  onAnswer: (isCorrect: boolean, score: number) => void; // Callback to report answer status and score.
 }
 
 // Extended interface for a card in the game, including its state.
@@ -24,7 +25,9 @@ const shuffleArray = <T,>(array: T[]): T[] => {
   return [...array].sort(() => Math.random() - 0.5);
 };
 
-export const MatchingGame: React.FC<MatchingGameProps> = ({ onComplete }) => {
+export const MatchingGame: React.FC<MatchingGameProps> = ({ onAnswer }) => {
+    // State to manage game level
+    const [level, setLevel] = useState<'easy' | 'medium' | 'hard' | null>(null);
     // State to hold the array of cards for the game.
     const [cards, setCards] = useState<Card[]>([]);
     // State to track the indices of the currently flipped cards (max 2).
@@ -33,11 +36,15 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onComplete }) => {
     const [isChecking, setIsChecking] = useState(false);
 
     /**
-     * Sets up or resets the game board.
-     * It duplicates the pairs, shuffles them, and initializes their state.
+     * Sets up or resets the game board based on the selected difficulty level.
      */
-    const setupGame = () => {
-        const duplicatedPairs = [...matchingPairs, ...matchingPairs];
+    const setupGame = (selectedLevel: 'easy' | 'medium' | 'hard') => {
+        let pairCount = 4;
+        if (selectedLevel === 'medium') pairCount = 8;
+        if (selectedLevel === 'hard') pairCount = 14;
+
+        const gamePairs = shuffleArray(matchingPairs).slice(0, pairCount);
+        const duplicatedPairs = [...gamePairs, ...gamePairs];
         const gameCards = shuffleArray(duplicatedPairs).map((pair, index) => ({
             ...pair,
             instanceId: index,
@@ -49,10 +56,12 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onComplete }) => {
         setIsChecking(false);
     }
 
-    // Effect to set up the game when the component mounts.
+    // Effect to set up the game when a level is chosen.
     useEffect(() => {
-        setupGame();
-    }, []);
+        if (level) {
+            setupGame(level);
+        }
+    }, [level]);
 
     // Effect to check for a match whenever two cards are flipped.
     useEffect(() => {
@@ -65,6 +74,8 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onComplete }) => {
 
         if (firstCard.id === secondCard.id) {
             // Match found
+            playCorrectSound();
+            onAnswer(true, 20); // Report correct match and award points.
             setTimeout(() => {
                 setCards(prevCards =>
                     prevCards.map((card, index) =>
@@ -73,12 +84,13 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onComplete }) => {
                             : card
                     )
                 );
-                onComplete(20); // Award points for a match.
                 setFlippedIndices([]);
                 setIsChecking(false);
             }, 800);
         } else {
             // No match, flip the cards back over.
+            playIncorrectSound();
+            onAnswer(false, 0); // Report incorrect match.
             setTimeout(() => {
                 setCards(prevCards =>
                     prevCards.map((card, index) =>
@@ -91,7 +103,7 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onComplete }) => {
                 setIsChecking(false);
             }, 1200);
         }
-    }, [flippedIndices, cards, onComplete]);
+    }, [flippedIndices, cards, onAnswer]);
     
     /**
      * Handles the user clicking on a card.
@@ -115,29 +127,67 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onComplete }) => {
 
     // Check if all cards have been matched.
     const allMatched = cards.length > 0 && cards.every(card => card.isMatched);
+    
+    if (!level) {
+        return (
+            <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-8 text-center animate-fade-in">
+                <h2 className="text-4xl font-bold text-slate-700 mb-2">اخْتَرِ الْمُسْتَوَى</h2>
+                <p className="text-2xl text-slate-500 mb-8">كُلَّمَا زَادَتِ الصُّعُوبَةُ، زَادَتِ النِّقَاطُ!</p>
+                <div className="flex flex-col gap-4">
+                    <button 
+                        onClick={() => setLevel('easy')} 
+                        className="w-full text-white font-bold py-4 px-8 rounded-full text-2xl hover:scale-105 transition-transform bg-green-500 hover:bg-green-600"
+                    >
+                        سَهْلٌ (4 أَزْوَاجٍ)
+                    </button>
+                    <button 
+                        onClick={() => setLevel('medium')} 
+                        className="w-full text-white font-bold py-4 px-8 rounded-full text-2xl hover:scale-105 transition-transform bg-amber-500 hover:bg-amber-600"
+                    >
+                        مُتَوَسِّطٌ (8 أَزْوَاجٍ)
+                    </button>
+                    <button 
+                        onClick={() => setLevel('hard')} 
+                        className="w-full text-white font-bold py-4 px-8 rounded-full text-2xl hover:scale-105 transition-transform bg-rose-500 hover:bg-rose-600"
+                    >
+                        صَعْبٌ (14 زَوْجًا)
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl p-4 sm:p-8">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-700 mb-2 text-center">بِطَاقَاتُ الذَّاكِرَةِ</h2>
-            <p className="text-lg sm:text-2xl text-slate-500 mb-8 text-center">اِقْلِبِ الْبِطَاقَاتِ لِتَجِدَ الْكَلِمَاتِ الْمُتَطَابِقَةِ.</p>
+            <h2 className="text-4xl sm:text-5xl font-bold text-slate-700 mb-2 text-center">بِطَاقَاتُ الذَّاكِرَةِ</h2>
+            <p className="text-xl sm:text-3xl text-slate-500 mb-8 text-center">اِقْلِبِ الْبِطَاقَاتِ لِتَجِدَ الْكَلِمَاتِ الْمُتَطَابِقَةِ.</p>
             
             {/* Game Board Grid */}
-            <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 sm:gap-5 justify-center">
+            <div className={`grid gap-2 sm:gap-5 justify-center ${level === 'hard' ? 'grid-cols-7' : 'grid-cols-4'}`}>
                 {cards.map((card, index) => (
                     <div
                         key={card.instanceId}
                         onClick={() => handleCardClick(index)}
-                        className={`aspect-[3/4] flex items-center justify-center rounded-lg sm:rounded-xl text-xl sm:text-3xl font-bold text-slate-700 transition-all duration-300 shadow-lg cursor-pointer transform ${card.isFlipped ? 'bg-white scale-105' : 'bg-amber-400 hover:bg-amber-500'} ${card.isMatched ? 'bg-green-200 border-2 sm:border-4 border-green-400 opacity-60' : ''}`}
+                        className={`aspect-[3/4] flex items-center justify-center rounded-lg sm:rounded-xl text-2xl sm:text-4xl font-bold text-slate-700 transition-all duration-300 shadow-lg cursor-pointer`}
                         style={{ perspective: '1000px' }}
                     >
                         {/* 3D Flip Animation Container */}
-                        <div className={`w-full h-full flex items-center justify-center transition-transform duration-500 ${card.isFlipped ? 'rotate-y-180' : ''}`} style={{ transformStyle: 'preserve-3d' }}>
+                        <div 
+                            className="w-full h-full flex items-center justify-center transition-transform duration-500 rounded-lg sm:rounded-xl" 
+                            style={{ 
+                                transformStyle: 'preserve-3d',
+                                transform: card.isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                                backgroundColor: card.isFlipped ? (card.isMatched ? '#A7F3D0' : 'white') : '#FBBF24',
+                                opacity: card.isMatched ? 0.7 : 1,
+                                border: card.isMatched ? '4px solid #34D399' : 'none',
+                            }}
+                        >
                            {/* Card Back */}
                            <div className="absolute w-full h-full flex items-center justify-center" style={{ backfaceVisibility: 'hidden' }}>
-                                <span className="text-4xl sm:text-6xl text-white/70">?</span>
+                                <span className="text-5xl sm:text-7xl text-white/70">?</span>
                            </div>
                            {/* Card Front */}
-                           <div className="absolute w-full h-full flex items-center justify-center rotate-y-180 p-1" style={{ backfaceVisibility: 'hidden' }}>
+                           <div className="absolute w-full h-full flex items-center justify-center p-1" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
                                 <span className="animate-fade-in">{card.word}</span>
                            </div>
                         </div>
@@ -148,10 +198,10 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onComplete }) => {
             {/* Completion Message */}
             {allMatched && (
                 <div className="text-center mt-8 animate-fade-in p-4 sm:p-6 bg-slate-50 rounded-lg">
-                    <p className="text-2xl sm:text-3xl font-bold text-green-600">🎉 رَائِعٌ! لَقَدْ أَكْمَلْتَ تَحَدِّيَ الذَّاكِرَةِ بِنَجَاحٍ! 🎉</p>
+                    <p className="text-3xl sm:text-4xl font-bold text-green-600">🎉 رَائِعٌ! لَقَدْ أَكْمَلْتَ تَحَدِّيَ الذَّاكِرَةِ بِنَجَاحٍ! 🎉</p>
                      <button 
-                        onClick={setupGame} 
-                        className="mt-4 sm:mt-6 bg-amber-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-amber-600 transition-colors text-lg sm:text-xl"
+                        onClick={() => setLevel(null)} 
+                        className="mt-4 sm:mt-6 bg-amber-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-amber-600 transition-colors text-lg sm:text-2xl"
                       >
                           الْعَبْ مَرَّةً أُخْرَى
                       </button>

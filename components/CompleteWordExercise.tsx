@@ -6,10 +6,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { WordQuestion } from '../types';
 import { wordQuestions } from '../data/arabicContent';
+import { playCorrectSound, playIncorrectSound } from '../utils/sounds';
 
 // Props interface for the component.
 interface CompleteWordExerciseProps {
-  onComplete: (score: number) => void; // Callback to update the total score.
+  onAnswer: (isCorrect: boolean, score: number) => void; // Callback to report answer status and score.
 }
 
 // A utility function to shuffle an array.
@@ -17,7 +18,9 @@ const shuffleArray = <T,>(array: T[]): T[] => {
   return [...array].sort(() => Math.random() - 0.5);
 };
 
-export const CompleteWordExercise: React.FC<CompleteWordExerciseProps> = ({ onComplete }) => {
+const correctFeedbackMessages = ['إِجَابَةٌ رَائِعَةٌ! ⭐', 'صَحِيحٌ! 💯', 'عَمَلٌ مُمْتَازٌ! ✔️', 'أَنْتَ ذَكِيٌّ! 🧠'];
+
+export const CompleteWordExercise: React.FC<CompleteWordExerciseProps> = ({ onAnswer }) => {
   // State to hold the shuffled list of questions.
   const [questions, setQuestions] = useState<WordQuestion[]>([]);
   // State to track the index of the current question.
@@ -38,6 +41,8 @@ export const CompleteWordExercise: React.FC<CompleteWordExerciseProps> = ({ onCo
   const shuffledOptions = useMemo(() => {
       return currentQuestion ? shuffleArray(currentQuestion.options) : [];
   }, [currentQuestion]);
+  // useMemo to get a random positive feedback message for each question.
+  const correctMessage = useMemo(() => correctFeedbackMessages[Math.floor(Math.random() * correctFeedbackMessages.length)], [currentQuestionIndex]);
 
   /**
    * Handles the user clicking on an option button.
@@ -50,9 +55,12 @@ export const CompleteWordExercise: React.FC<CompleteWordExerciseProps> = ({ onCo
     setSelectedOption(option);
     if (option === currentQuestion.correctWord) {
       setFeedback('correct');
-      onComplete(10); // Award points for correct answer.
+      playCorrectSound();
+      onAnswer(true, 10); // Report correct answer and award points.
     } else {
       setFeedback('incorrect');
+      playIncorrectSound();
+      onAnswer(false, 0); // Report incorrect answer.
     }
   };
 
@@ -103,18 +111,18 @@ export const CompleteWordExercise: React.FC<CompleteWordExerciseProps> = ({ onCo
   return (
     <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl p-4 sm:p-8">
       {/* Progress Bar */}
-      <p className="text-slate-500 font-semibold mb-2 text-sm sm:text-base">
+      <p className="text-slate-500 font-semibold mb-2 text-lg sm:text-xl">
         اَلسُّؤَالُ {currentQuestionIndex + 1} مِنْ {questions.length}
       </p>
       <div className="h-3 w-full bg-slate-200 rounded-full mb-4 sm:mb-8">
           <div className="h-3 bg-emerald-500 rounded-full transition-all duration-300" style={{width: `${((currentQuestionIndex + 1) / questions.length) * 100}%`}}></div>
       </div>
       
-      <h2 className="text-3xl sm:text-4xl font-bold text-slate-700 mb-6 text-center">أَكْمِلِ الْجُمْلَةَ:</h2>
+      <h2 className="text-4xl sm:text-5xl font-bold text-slate-700 mb-6 text-center">أَكْمِلِ الْجُمْلَةَ:</h2>
       
       {/* Display for the sentence hint with a blank space */}
       <div className="text-center mb-8 bg-slate-100 p-4 sm:p-8 rounded-lg">
-           <p className="text-3xl sm:text-5xl font-bold text-slate-800 leading-relaxed">
+           <p className="text-4xl sm:text-6xl font-bold text-slate-800 leading-relaxed">
               {currentQuestion.sentenceHint.split('___').map((part, index) => (
                   <React.Fragment key={index}>
                       {part}
@@ -135,7 +143,7 @@ export const CompleteWordExercise: React.FC<CompleteWordExerciseProps> = ({ onCo
             key={option}
             onClick={() => handleOptionClick(option)}
             disabled={!!feedback}
-            className={`p-4 sm:p-6 text-xl sm:text-3xl font-bold rounded-xl shadow-md transition-all duration-300 border-4 ${getButtonClass(option)}`}
+            className={`p-4 sm:p-6 text-2xl sm:text-4xl font-bold rounded-xl shadow-md transition-all duration-300 border-4 ${getButtonClass(option)}`}
           >
             {option}
           </button>
@@ -145,13 +153,13 @@ export const CompleteWordExercise: React.FC<CompleteWordExerciseProps> = ({ onCo
       {/* Feedback Section */}
       {feedback && (
         <div className="text-center animate-fade-in mt-4 sm:mt-8 p-4 sm:p-6 bg-slate-50 rounded-lg">
-           <p className={`text-2xl sm:text-3xl font-bold mb-4 ${feedback === 'correct' ? 'text-green-600' : 'text-red-600'}`}>
-              {feedback === 'correct' ? 'إِجَابَةٌ رَائِعَةٌ! ⭐' : `لِلْأَسَفِ! اَلْإِجَابَةُ الصَّحِيحَةُ هِيَ "${currentQuestion.correctWord}"`}
+           <p className={`text-3xl sm:text-4xl font-bold mb-4 ${feedback === 'correct' ? 'text-green-600' : 'text-red-600'}`}>
+              {feedback === 'correct' ? correctMessage : `لِلْأَسَفِ! اَلْإِجَابَةُ الصَّحِيحَةُ هِيَ "${currentQuestion.correctWord}"`}
            </p>
-           <p className="text-2xl sm:text-3xl text-slate-600">اَلْجُمْلَةُ الْكَامِلَةُ: <span className="font-bold text-emerald-600">{fullSentence}</span></p>
+           <p className="text-3xl sm:text-4xl text-slate-600">اَلْجُمْلَةُ الْكَامِلَةُ: <span className="font-bold text-emerald-600">{fullSentence}</span></p>
            <button 
               onClick={handleNextQuestion} 
-              className="mt-4 sm:mt-6 bg-emerald-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-emerald-600 transition-colors text-lg sm:text-xl"
+              className="mt-4 sm:mt-6 bg-emerald-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-emerald-600 transition-colors text-xl sm:text-2xl"
             >
                 اَلسُّؤَالُ التَّالِي
             </button>

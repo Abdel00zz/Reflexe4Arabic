@@ -12,7 +12,7 @@ export enum ActivityType {
   COMPLETE_WORD = 'COMPLETE_WORD',
   MATCHING_GAME = 'MATCHING_GAME',
   WORD_SCRAMBLE = 'WORD_SCRAMBLE',
-  CROSSWORD = 'CROSSWORD',
+  WHO_AM_I = 'WHO_AM_I', // Replaced CROSSWORD
   SENTENCE_BUILDER = 'SENTENCE_BUILDER',
 }
 
@@ -66,27 +66,30 @@ export interface SentenceQuestion {
 }
 
 /**
- * Interface for a single clue in the Crossword puzzle.
+ * Interface for a question in the "Who Am I?" riddle exercise.
+ */
+export interface WhoAmIQuestion {
+  id: number;
+  riddle: string;
+  answer: string;
+  options: string[];
+  image: string; // URL for the answer's image
+}
+
+// FIX: Add missing CrosswordClue interface for the CrosswordExercise component.
+/**
+ * Interface for a clue in the Crossword exercise.
  */
 export interface CrosswordClue {
   number: number;
   clue: string;
   answer: string;
+  direction: 'across' | 'down';
   row: number;
   col: number;
-  direction: 'across' | 'down';
 }
 
-/**
- * Interface for the entire Crossword puzzle data.
- */
-export interface CrosswordData {
-  id: number;
-  size: number; // The grid size (e.g., 5 for a 5x5 grid).
-  clues: CrosswordClue[];
-}
 
-// FIX: Add StoryWord interface for StorySpark component.
 /**
  * Interface for a word used in the Story Spark component.
  */
@@ -96,7 +99,6 @@ export interface StoryWord {
   emoji: string;
 }
 
-// FIX: Add ListenQuestion interface for ListenChooseExercise component.
 /**
  * Interface for a question in the "Listen and Choose" exercise.
  */
@@ -104,4 +106,20 @@ export interface ListenQuestion {
   id: number;
   correctWord: string; // The word to be spoken.
   options: string[]; // List of words to choose from, including the correct one.
+}
+
+/**
+ * Interface for tracking results for a single activity.
+ */
+export interface ActivityResult {
+  correct: number;
+  incorrect: number;
+  score: number;
+}
+
+/**
+ * Type for storing detailed results for all activities.
+ */
+export type DetailedResults = {
+  [key in ActivityType]?: ActivityResult;
 }

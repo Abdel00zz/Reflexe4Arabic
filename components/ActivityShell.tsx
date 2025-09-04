@@ -31,7 +31,7 @@ export const ActivityShell: React.FC<ActivityShellProps> = ({ score, onBackToMen
             <div className="flex items-center gap-2 sm:gap-3 bg-yellow-100 text-yellow-800 font-bold px-3 py-2 sm:px-5 sm:py-3 rounded-full shadow-md">
               {/* Using a modern icon for the star. Made responsive. */}
               <FaStar className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-400" />
-              <span className="text-xl sm:text-2xl">{score}</span>
+              <span className="text-2xl sm:text-3xl">{score}</span>
             </div>
         </div>
         {/* Buttons container, positioned at the top-right */}

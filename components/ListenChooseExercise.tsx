@@ -9,6 +9,7 @@ import { ListenQuestion } from '../types';
 import { listenQuestions } from '../data/arabicContent';
 // Import modern icons
 import { FaVolumeUp, FaArrowLeft } from 'react-icons/fa';
+import { playCorrectSound, playIncorrectSound } from '../utils/sounds';
 
 // Props interface for the component.
 interface ListenChooseExerciseProps {
@@ -73,9 +74,11 @@ export const ListenChooseExercise: React.FC<ListenChooseExerciseProps> = ({ onCo
     setSelectedOption(option);
     if (option === currentQuestion.correctWord) {
       setFeedback('correct');
+      playCorrectSound();
       onComplete(15);
     } else {
       setFeedback('incorrect');
+      playIncorrectSound();
     }
   };
 
@@ -88,8 +91,9 @@ export const ListenChooseExercise: React.FC<ListenChooseExerciseProps> = ({ onCo
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      // This could be improved to show a completion screen or loop.
-      alert("عَمَلٌ مُمْتَازٌ! لَقَدْ أَنْهَيْتَ تَحَدِّيَ الاِسْتِمَاعِ!");
+      // Reshuffle and start over.
+      setQuestions(shuffleArray(listenQuestions));
+      setCurrentQuestionIndex(0);
     }
   };
 

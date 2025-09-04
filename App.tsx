@@ -7,24 +7,27 @@
 import React, { useState, useCallback } from 'react';
 // Import the Tooltip component for global use.
 import { Tooltip } from 'react-tooltip';
-import { ActivityType } from './types';
+import { ActivityType, DetailedResults } from './types';
 import { MainMenu } from './components/MainMenu';
 import { ActivityShell } from './components/ActivityShell';
 import { HelpModal } from './components/HelpModal';
+import { ResultsModal } from './components/ResultsModal';
 import { CompleteLetterExercise } from './components/CompleteLetterExercise';
 import { CompleteWordExercise } from './components/CompleteWordExercise';
 import { MatchingGame } from './components/MatchingGame';
 import { WordScrambleExercise } from './components/WordScrambleExercise';
-import { CrosswordExercise } from './components/CrosswordExercise';
+import { WhoAmIExercise } from './components/WhoAmIExercise';
 import { SentenceBuilderExercise } from './components/SentenceBuilderExercise';
 
 const App: React.FC = () => {
   // State to manage the currently active screen/activity. Defaults to the main menu.
   const [activity, setActivity] = useState<ActivityType>(ActivityType.MENU);
-  // State to manage the user's total score across all activities.
-  const [score, setScore] = useState<number>(0);
+  // State to manage detailed results for each activity.
+  const [detailedResults, setDetailedResults] = useState<DetailedResults>({});
   // State to manage the visibility of the help modal.
   const [isHelpModalOpen, setIsHelpModalOpen] = useState<boolean>(false);
+  // State to manage the visibility of the results modal.
+  const [isResultsModalOpen, setIsResultsModalOpen] = useState<boolean>(false);
 
   /**
    * Sets the current activity.
@@ -44,14 +47,31 @@ const App: React.FC = () => {
   }, []);
   
   /**
-   * Updates the score by adding points.
-   * Wrapped in useCallback to prevent infinite re-render loops in useEffect hooks
-   * within exercise components that have `onComplete` as a dependency.
-   * @param {number} points - The number of points to add to the score.
+   * Updates the detailed results based on the user's answer in an exercise.
+   * @param {ActivityType} activityType - The type of activity being played.
+   * @param {boolean} isCorrect - Whether the user's answer was correct.
+   * @param {number} points - The number of points to add to the score if correct.
    */
-  const handleScoreUpdate = useCallback((points: number) => {
-      setScore(prevScore => prevScore + points);
+  const handleAnswer = useCallback((activityType: ActivityType, isCorrect: boolean, points: number) => {
+      setDetailedResults(prev => {
+          const newResults = { ...prev };
+          // Get the current results for the specific activity, or initialize if it's the first time.
+          const currentActivityResults = newResults[activityType] || { correct: 0, incorrect: 0, score: 0 };
+          
+          if (isCorrect) {
+              currentActivityResults.correct += 1;
+              currentActivityResults.score += points;
+          } else {
+              currentActivityResults.incorrect += 1;
+          }
+          
+          newResults[activityType] = currentActivityResults;
+          return newResults;
+      });
   }, []);
+
+  // Calculate the total score from the detailed results object.
+  const totalScore = Object.values(detailedResults).reduce((sum, result) => sum + (result?.score || 0), 0);
 
   /**
    * Renders the component corresponding to the current activity state.
@@ -59,37 +79,42 @@ const App: React.FC = () => {
    * @returns {JSX.Element} The component to be rendered.
    */
   const renderActivity = () => {
-    const exerciseProps = { onComplete: handleScoreUpdate };
+    // Helper function to create a handler for a specific activity type.
+    const createAnswerHandler = (activityType: ActivityType) => (isCorrect: boolean, points: number) => handleAnswer(activityType, isCorrect, points);
     let exerciseComponent: React.ReactNode;
 
     switch (activity) {
       case ActivityType.COMPLETE_LETTER:
-        exerciseComponent = <CompleteLetterExercise {...exerciseProps} />;
+        exerciseComponent = <CompleteLetterExercise onAnswer={createAnswerHandler(ActivityType.COMPLETE_LETTER)} />;
         break;
       case ActivityType.COMPLETE_WORD:
-        exerciseComponent = <CompleteWordExercise {...exerciseProps} />;
+        exerciseComponent = <CompleteWordExercise onAnswer={createAnswerHandler(ActivityType.COMPLETE_WORD)} />;
         break;
       case ActivityType.MATCHING_GAME:
-        exerciseComponent = <MatchingGame {...exerciseProps} />;
+        exerciseComponent = <MatchingGame onAnswer={createAnswerHandler(ActivityType.MATCHING_GAME)} />;
         break;
       case ActivityType.WORD_SCRAMBLE:
-        exerciseComponent = <WordScrambleExercise {...exerciseProps} />;
+        exerciseComponent = <WordScrambleExercise onAnswer={createAnswerHandler(ActivityType.WORD_SCRAMBLE)} />;
         break;
-      case ActivityType.CROSSWORD:
-        exerciseComponent = <CrosswordExercise {...exerciseProps} />;
+      case ActivityType.WHO_AM_I:
+        exerciseComponent = <WhoAmIExercise onAnswer={createAnswerHandler(ActivityType.WHO_AM_I)} />;
         break;
       case ActivityType.SENTENCE_BUILDER:
-        exerciseComponent = <SentenceBuilderExercise {...exerciseProps} />;
+        exerciseComponent = <SentenceBuilderExercise onAnswer={createAnswerHandler(ActivityType.SENTENCE_BUILDER)} />;
         break;
       case ActivityType.MENU:
       default:
         // If the activity is MENU or any other value, show the main menu.
-        return <MainMenu onSelectActivity={handleSelectActivity} onOpenHelp={() => setIsHelpModalOpen(true)} />;
+        return <MainMenu 
+          onSelectActivity={handleSelectActivity} 
+          onOpenHelp={() => setIsHelpModalOpen(true)}
+          onOpenResults={() => setIsResultsModalOpen(true)}
+        />;
     }
     
     // For any exercise, wrap it in the ActivityShell to provide a consistent UI.
     return (
-        <ActivityShell score={score} onBackToMenu={handleBackToMenu}>
+        <ActivityShell score={totalScore} onBackToMenu={handleBackToMenu}>
             {exerciseComponent}
         </ActivityShell>
     );
@@ -103,6 +128,9 @@ const App: React.FC = () => {
       
       {/* Render the Help Modal, its visibility is controlled by state. */}
       <HelpModal isOpen={isHelpModalOpen} onClose={() => setIsHelpModalOpen(false)} />
+      
+      {/* Render the Results Modal */}
+      <ResultsModal isOpen={isResultsModalOpen} onClose={() => setIsResultsModalOpen(false)} results={detailedResults} totalScore={totalScore} />
       
       {/* 
         Global Tooltip component. 

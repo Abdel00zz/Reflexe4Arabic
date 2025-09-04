@@ -1,173 +1,177 @@
 /**
- * @file This file contains the Crossword exercise component.
- * It provides a classic crossword puzzle where users fill in a grid based on clues.
- * This is a more advanced exercise for developing vocabulary and critical thinking.
+ * @file This file contains the "Crossword" exercise component.
+ * It provides a classic crossword puzzle to test vocabulary and spelling.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { CrosswordData, CrosswordClue } from '../types';
+import { CrosswordClue } from '../types';
 import { crosswordData } from '../data/arabicContent';
+import { playCorrectSound, playIncorrectSound } from '../utils/sounds';
 
-// Props interface for the component.
 interface CrosswordExerciseProps {
-  onComplete: (score: number) => void; // Callback to update the total score.
+  onAnswer: (isCorrect: boolean, score: number) => void;
 }
 
-// Type definition for the grid state: a 2D array of strings or nulls.
 type GridState = (string | null)[][];
+type LockState = boolean[][];
 
-export const CrosswordExercise: React.FC<CrosswordExerciseProps> = ({ onComplete }) => {
-  // State to hold the current state of the crossword grid.
+export const CrosswordExercise: React.FC<CrosswordExerciseProps> = ({ onAnswer }) => {
   const [grid, setGrid] = useState<GridState>([]);
-  // State to track the currently selected clue.
+  const [locked, setLocked] = useState<LockState>([]);
   const [activeClue, setActiveClue] = useState<CrosswordClue | null>(null);
-  // State to track if the puzzle has been successfully completed.
-  const [isComplete, setIsComplete] = useState(false);
-  // Ref to hold references to all the input elements in the grid for focus management.
   const inputRefs = useRef<(HTMLInputElement | null)[][]>([]);
+  const [completedClues, setCompletedClues] = useState<number[]>([]);
 
-  // Effect to initialize the grid when the component mounts.
   useEffect(() => {
-    // Create an empty grid filled with nulls.
-    const newGrid = Array(crosswordData.size).fill(null).map(() => Array(crosswordData.size).fill(null));
-    // Populate the grid with empty strings for cells that are part of a clue.
-    crosswordData.clues.forEach(clue => {
-      for (let i = 0; i < clue.answer.length; i++) {
-        if (clue.direction === 'across') {
-          newGrid[clue.row][clue.col + i] = '';
-        } else {
-          newGrid[clue.row + i][clue.col] = '';
-        }
-      }
-    });
-    setGrid(newGrid);
-    // Initialize the refs array with the same dimensions.
-    inputRefs.current = Array(crosswordData.size).fill(null).map(() => Array(crosswordData.size).fill(null));
+    const { size } = crosswordData;
+    const initialGrid: GridState = Array(size).fill(null).map(() => Array(size).fill(null));
+    const initialLock: LockState = Array(size).fill(false).map(() => Array(size).fill(false));
+    inputRefs.current = Array(size).fill(null).map(() => Array(size).fill(null));
+    setGrid(initialGrid);
+    setLocked(initialLock);
+    setActiveClue(crosswordData.clues[0]);
   }, []);
 
-  /**
-   * Checks if all answers in the grid are correct.
-   */
-  const checkCompletion = () => {
-    for (const clue of crosswordData.clues) {
-      let userAnswer = '';
-      for (let i = 0; i < clue.answer.length; i++) {
-        userAnswer += clue.direction === 'across' ? grid[clue.row][clue.col + i] : grid[clue.row + i][clue.col];
+  const handleCellClick = (row: number, col: number) => {
+    const clickedClue = crosswordData.clues.find(clue => {
+      if (clue.direction === 'across') {
+        return row === clue.row && col >= clue.col && col < clue.col + clue.answer.length;
+      } else { // down
+        return col === clue.col && row >= clue.row && row < clue.row + clue.answer.length;
       }
-      // If any answer is incorrect, stop checking.
-      if (userAnswer.toLowerCase() !== clue.answer.toLowerCase()) {
-        // Here you could add feedback for incorrect answers.
-        return;
-      }
+    });
+    if (clickedClue) {
+      setActiveClue(clickedClue);
     }
-    // If all answers are correct, mark as complete and award points.
-    setIsComplete(true);
-    onComplete(50);
   };
-  
-  /**
-   * Handles changes to an input cell in the grid.
-   * @param {number} row - The row of the changed cell.
-   * @param {number} col - The column of the changed cell.
-   * @param {string} value - The new value (a single letter).
-   */
-  const handleInputChange = (row: number, col: number, value: string) => {
-    if (isComplete || value.length > 1) return;
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, row: number, col: number) => {
+    const value = e.target.value.slice(-1); // Only take the last character
     const newGrid = [...grid];
     newGrid[row][col] = value;
     setGrid(newGrid);
 
-    // Auto-focus the next cell in the active clue's direction.
-    if(value && activeClue) {
-      if (activeClue.direction === 'across' && col < crosswordData.size - 1) {
-        inputRefs.current[row][col+1]?.focus();
-      } else if (activeClue.direction === 'down' && row < crosswordData.size - 1) {
-        inputRefs.current[row+1][col]?.focus();
+    // Auto-focus next input
+    if (value && activeClue) {
+      let nextRow = row;
+      let nextCol = col;
+      if (activeClue.direction === 'across') {
+        nextCol++;
+      } else {
+        nextRow++;
+      }
+      if (
+        nextRow < crosswordData.size &&
+        nextCol < crosswordData.size &&
+        inputRefs.current[nextRow] &&
+        inputRefs.current[nextRow][nextCol]
+      ) {
+        inputRefs.current[nextRow][nextCol]?.focus();
+      } else {
+         checkClueCompletion(activeClue);
       }
     }
   };
   
-  /**
-   * Sets the active clue when a user clicks on a cell.
-   * @param {number} row - The row of the clicked cell.
-   * @param {number} col - The column of the clicked cell.
-   */
-  const handleCellClick = (row: number, col: number) => {
-      // Find the clue associated with the clicked cell.
-      const clue = crosswordData.clues.find(c => {
-          if (c.direction === 'across') {
-              return c.row === row && col >= c.col && col < c.col + c.answer.length;
+  const checkClueCompletion = (clue: CrosswordClue) => {
+      let word = '';
+      if (clue.direction === 'across') {
+          for (let i = 0; i < clue.answer.length; i++) {
+              word += grid[clue.row][clue.col + i] || '';
           }
-          return c.col === col && row >= c.row && row < c.row + c.answer.length;
-      });
-      setActiveClue(clue || null);
-  }
+      } else {
+          for (let i = 0; i < clue.answer.length; i++) {
+              word += grid[clue.row + i][clue.col] || '';
+          }
+      }
+
+      if (word.length === clue.answer.length) {
+          if (word === clue.answer) {
+              if (!completedClues.includes(clue.number)) {
+                  playCorrectSound();
+                  onAnswer(true, 10);
+                  setCompletedClues(prev => [...prev, clue.number]);
+                  // Lock the cells
+                  const newLocked = [...locked];
+                  if (clue.direction === 'across') {
+                      for (let i = 0; i < clue.answer.length; i++) newLocked[clue.row][clue.col + i] = true;
+                  } else {
+                      for (let i = 0; i < clue.answer.length; i++) newLocked[clue.row + i][clue.col] = true;
+                  }
+                  setLocked(newLocked);
+              }
+          } else {
+              playIncorrectSound();
+              onAnswer(false, 0);
+          }
+      }
+  };
+
+  const isCellPartOfClue = (row: number, col: number, clue: CrosswordClue) => {
+    if (clue.direction === 'across') {
+      return row === clue.row && col >= clue.col && col < clue.col + clue.answer.length;
+    }
+    return col === clue.col && row >= clue.row && row < clue.row + clue.answer.length;
+  };
+  
+  const allClues = crosswordData.clues;
+  const isComplete = completedClues.length === allClues.length;
 
   return (
-    <div className="w-full max-w-6xl bg-white rounded-2xl shadow-xl p-2 sm:p-8 flex flex-col lg:flex-row gap-4 sm:gap-8">
-      {/* Left side: Crossword Grid */}
-      <div className="w-full lg:w-2/3">
-        <h2 className="text-3xl sm:text-4xl font-bold text-slate-700 mb-4 sm:mb-6 text-center">الْكَلِمَاتُ الْمُتَقَاطِعَةُ</h2>
-        <div className="grid gap-0.5 sm:gap-1 bg-slate-800 p-1 sm:p-2 rounded-lg" style={{ gridTemplateColumns: `repeat(${crosswordData.size}, 1fr)` }}>
-          {grid.map((row, rowIndex) =>
-            row.map((cell, colIndex) => {
-              // Non-playable cells are rendered as solid blocks.
-              if (cell === null) {
-                return <div key={`${rowIndex}-${colIndex}`} className="aspect-square bg-slate-800" />;
-              }
-              const clueNumber = crosswordData.clues.find(c => c.row === rowIndex && c.col === colIndex)?.number;
-              return (
-                <div key={`${rowIndex}-${colIndex}`} className="relative aspect-square bg-white">
-                  {clueNumber && <span className="absolute top-0 right-0.5 text-[8px] sm:text-xs font-bold text-slate-500">{clueNumber}</span>}
-                  <input
-                    ref={el => { inputRefs.current[rowIndex][colIndex] = el; }}
-                    type="text"
-                    maxLength={1}
-                    value={cell || ''}
-                    onChange={(e) => handleInputChange(rowIndex, colIndex, e.target.value)}
-                    onClick={() => handleCellClick(rowIndex, colIndex)}
-                    className="w-full h-full text-center text-xl sm:text-2xl md:text-4xl font-bold bg-transparent outline-none focus:bg-amber-100"
-                    disabled={isComplete}
-                  />
-                </div>
-              );
-            })
-          )}
-        </div>
-         <div className="text-center mt-4 sm:mt-6">
-            <button onClick={checkCompletion} disabled={isComplete} className="bg-slate-700 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-slate-800 transition-colors text-lg sm:text-xl disabled:bg-slate-400">
-              {isComplete ? 'أَحْسَنْتَ!' : 'تَحَقَّقْ مِنَ الْإِجَابَاتِ'}
-            </button>
-        </div>
+    <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl p-4 sm:p-8 flex flex-col lg:flex-row gap-8">
+      {/* Grid */}
+      <div className="flex-grow">
+          <h2 className="text-4xl font-bold text-slate-700 mb-4 text-center">الْكَلِمَاتُ الْمُتَقَاطِعَةُ</h2>
+          <div dir="rtl" style={{ display: 'grid', gridTemplateColumns: `repeat(${crosswordData.size}, 1fr)`, gap: '4px' }}>
+            {grid.map((row, r) =>
+              row.map((cell, c) => {
+                const isPartOfAnyClue = allClues.some(clue => isCellPartOfClue(r, c, clue));
+                if (!isPartOfAnyClue) {
+                  return <div key={`${r}-${c}`} className="aspect-square bg-slate-700 rounded-sm"></div>;
+                }
+                const clueNumber = allClues.find(clue => clue.row === r && clue.col === c)?.number;
+                const isLocked = locked[r]?.[c];
+
+                return (
+                  <div key={`${r}-${c}`} className="relative aspect-square">
+                    {clueNumber && <span className="absolute top-0 right-1 text-xs text-slate-500 font-bold">{clueNumber}</span>}
+                    <input
+                      ref={el => { if(inputRefs.current[r]) inputRefs.current[r][c] = el }}
+                      type="text"
+                      value={cell || ''}
+                      onChange={(e) => handleInputChange(e, r, c)}
+                      onClick={() => handleCellClick(r, c)}
+                      maxLength={1}
+                      disabled={isLocked}
+                      className={`w-full h-full text-center text-xl sm:text-2xl font-bold rounded-sm border-2 ${activeClue && isCellPartOfClue(r, c, activeClue) ? 'border-sky-500 bg-sky-100' : 'border-slate-300'} ${isLocked ? 'bg-green-200 text-green-800' : 'bg-white'}`}
+                    />
+                  </div>
+                );
+              })
+            )}
+          </div>
+          {isComplete && <div className="text-center mt-4 p-4 bg-green-100 text-green-700 font-bold rounded-lg">أَحْسَنْتَ! لَقَدْ أَكْمَلْتَ الشَّبَكَةَ بِنَجَاحٍ!</div>}
       </div>
-      {/* Right side: Clue List */}
-      <div className="w-full lg:w-1/3 bg-slate-50 p-4 sm:p-6 rounded-lg max-h-[40vh] lg:max-h-full overflow-y-auto">
-        <h3 className="text-xl sm:text-2xl font-bold mb-4 text-slate-600">الْأَلْغَازُ:</h3>
-        <div className="space-y-4 text-sm sm:text-base">
+      
+      {/* Clues */}
+      <div className="w-full lg:w-80 flex-shrink-0">
+          <div className="mb-4">
+              <h3 className="text-2xl font-bold text-slate-600 border-b-2 border-slate-200 pb-2 mb-2">أُفُقِيٌّ</h3>
+              {allClues.filter(c => c.direction === 'across').map(clue => (
+                  <div key={clue.number} onClick={() => setActiveClue(clue)} className={`p-2 rounded cursor-pointer ${activeClue?.number === clue.number ? 'bg-sky-100' : ''} ${completedClues.includes(clue.number) ? 'line-through text-slate-400' : ''}`}>
+                      <strong>{clue.number}.</strong> {clue.clue}
+                  </div>
+              ))}
+          </div>
           <div>
-            <h4 className="font-bold text-slate-800">أُفُقِيًّا:</h4>
-            <ul className="list-inside list-disc text-slate-600 space-y-1">
-              {crosswordData.clues.filter(c => c.direction === 'across').map(clue => <li key={clue.number} className={`p-1 rounded ${activeClue?.number === clue.number ? 'bg-amber-200' : ''}`}>{clue.number}. {clue.clue}</li>)}
-            </ul>
+              <h3 className="text-2xl font-bold text-slate-600 border-b-2 border-slate-200 pb-2 mb-2">رَأْسِيٌّ</h3>
+              {allClues.filter(c => c.direction === 'down').map(clue => (
+                  <div key={clue.number} onClick={() => setActiveClue(clue)} className={`p-2 rounded cursor-pointer ${activeClue?.number === clue.number ? 'bg-sky-100' : ''} ${completedClues.includes(clue.number) ? 'line-through text-slate-400' : ''}`}>
+                      <strong>{clue.number}.</strong> {clue.clue}
+                  </div>
+              ))}
           </div>
-          <div className="mt-4">
-            <h4 className="font-bold text-slate-800">عَمُودِيًّا:</h4>
-            <ul className="list-inside list-disc text-slate-600 space-y-1">
-              {crosswordData.clues.filter(c => c.direction === 'down').map(clue => <li key={clue.number} className={`p-1 rounded ${activeClue?.number === clue.number ? 'bg-amber-200' : ''}`}>{clue.number}. {clue.clue}</li>)}
-            </ul>
-          </div>
-        </div>
       </div>
-      {/* Completion Overlay */}
-      {isComplete && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center animate-fade-in">
-            <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-2xl text-center">
-                <p className="text-4xl sm:text-5xl mb-4">🎉</p>
-                <h2 className="text-3xl sm:text-4xl font-black text-green-600">عَمَلٌ مُذْهِلٌ!</h2>
-                <p className="text-lg sm:text-xl text-slate-600 mt-2">لَقَدْ حَلَلْتَ لُغْزَ الْكَلِمَاتِ الْمُتَقَاطِعَةِ!</p>
-            </div>
-        </div>
-      )}
     </div>
   );
 };
