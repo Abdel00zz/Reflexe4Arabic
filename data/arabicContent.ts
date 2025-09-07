@@ -13,7 +13,6 @@ import {
   WhoAmIQuestion,
   ListenQuestion,
   CrosswordClue,
-  WordHunterQuestion,
   FlashWordQuestion,
   StoryWord,
   StoryLogicQuestion,
@@ -111,51 +110,64 @@ export const wordQuestions: WordQuestion[] = [
   { id: 42, sentenceHint: 'الْغُيُومُ فِي السَّمَاءِ لَوْنُهَا ___', correctWord: 'أَبْيَضُ', options: ['أَزْرَقُ', 'أَخْضَرُ', 'أَبْيَضُ'] }
 ];
 
-// Data for "Matching Game". (Expanded to 42 pairs with emojis)
-export const matchingPairs: MatchingPair[] = [
-  { id: 1, word: 'أَسَدٌ', emoji: '🦁' },
-  { id: 2, word: 'بَيْتٌ', emoji: '🏠' },
-  { id: 3, word: 'تُفَّاحَةٌ', emoji: '🍎' },
-  { id: 4, word: 'ثَوْبٌ', emoji: '👕' },
-  { id: 5, word: 'جَمَلٌ', emoji: '🐪' },
-  { id: 6, word: 'حِصَانٌ', emoji: '🐎' },
-  { id: 7, word: 'خَرُوفٌ', emoji: '🐑' },
-  { id: 8, word: 'دِيكٌ', emoji: '🐓' },
-  { id: 9, word: 'ذِئْبٌ', emoji: '🐺' },
-  { id: 10, word: 'رَجُلٌ', emoji: '👨' },
-  { id: 11, word: 'زَهْرَةٌ', emoji: '🌸' },
-  { id: 12, word: 'سَيَّارَةٌ', emoji: '🚗' },
-  { id: 13, word: 'شَجَرَةٌ', emoji: '🌳' },
-  { id: 14, word: 'صَقْرٌ', emoji: '🦅' },
-  { id: 15, word: 'ضِفْدَعٌ', emoji: '🐸' },
-  { id: 16, word: 'طَاوُوسٌ', emoji: '🦚' },
-  { id: 17, word: 'ظَبْيٌ', emoji: '🦌' },
-  { id: 18, word: 'عَيْنٌ', emoji: '👁️' },
-  { id: 19, word: 'غُرَابٌ', emoji: '🐦‍⬛' },
-  { id: 20, word: 'فَرَاشَةٌ', emoji: '🦋' },
-  { id: 21, word: 'قَلَمٌ', emoji: '✏️' },
-  { id: 22, word: 'كُرَةٌ', emoji: '⚽' },
-  { id: 23, word: 'لَيْمُونٌ', emoji: '🍋' },
-  { id: 24, word: 'مِفْتَاحٌ', emoji: '🔑' },
-  { id: 25, word: 'نَجْمَةٌ', emoji: '⭐' },
-  { id: 26, word: 'هِلالٌ', emoji: '🌙' },
-  { id: 27, word: 'وَرْدَةٌ', emoji: '🌹' },
-  { id: 28, word: 'يَدٌ', emoji: '🖐️' },
-  { id: 29, word: 'بَابٌ', emoji: '🚪' },
-  { id: 30, word: 'سَاعَةٌ', emoji: '⏰' },
-  { id: 31, word: 'مَدْرَسَةٌ', emoji: '🏫' },
-  { id: 32, word: 'طَبِيبٌ', emoji: '👨‍⚕️' },
-  { id: 33, word: 'مُسْتَشْفَى', emoji: '🏥' },
-  { id: 34, word: 'دَفْتَرٌ', emoji: '📓' },
-  { id: 35, word: 'مِمْحَاةٌ', emoji: '📝' },
-  { id: 36, word: 'شُرْطِيّ', emoji: '👮' },
-  { id: 37, word: 'مُمَرِّضَةٌ', emoji: '👩‍⚕️' },
-  { id: 38, word: 'مَطَرٌ', emoji: '🌧️' },
-  { id: 39, word: 'شَمْسٌ', emoji: '☀️' },
-  { id: 40, word: 'قَلْبٌ', emoji: '❤️' },
-  { id: 41, word: 'هَاتِفٌ', emoji: '📱' },
-  { id: 42, word: 'كِتَابٌ', emoji: '📖' }
+// Re-structured data for "Matching Game" to support multiple exercises per level.
+const allMatchingPairs: MatchingPair[] = [
+  { id: 1, word: 'أَسَدٌ', emoji: '🦁' }, { id: 2, word: 'بَيْتٌ', emoji: '🏠' },
+  { id: 3, word: 'تُفَّاحَةٌ', emoji: '🍎' }, { id: 4, word: 'ثَوْبٌ', emoji: '👕' },
+  { id: 5, word: 'جَمَلٌ', emoji: '🐪' }, { id: 6, word: 'حِصَانٌ', emoji: '🐎' },
+  { id: 7, word: 'خَرُوفٌ', emoji: '🐑' }, { id: 8, word: 'دِيكٌ', emoji: '🐓' },
+  { id: 9, word: 'ذِئْبٌ', emoji: '🐺' }, { id: 10, word: 'رَجُلٌ', emoji: '👨' },
+  { id: 11, word: 'زَهْرَةٌ', emoji: '🌸' }, { id: 12, word: 'سَيَّارَةٌ', emoji: '🚗' },
+  { id: 13, word: 'شَجَرَةٌ', emoji: '🌳' }, { id: 14, word: 'صَقْرٌ', emoji: '🦅' },
+  { id: 15, word: 'ضِفْدَعٌ', emoji: '🐸' }, { id: 16, word: 'طَاوُوسٌ', emoji: '🦚' },
+  { id: 17, word: 'ظَبْيٌ', emoji: '🦌' }, { id: 18, word: 'عَيْنٌ', emoji: '👁️' },
+  { id: 19, word: 'غُرَابٌ', emoji: '🐦‍⬛' }, { id: 20, word: 'فَرَاشَةٌ', emoji: '🦋' },
+  { id: 21, word: 'قَلَمٌ', emoji: '✏️' }, { id: 22, word: 'كُرَةٌ', emoji: '⚽' },
+  { id: 23, word: 'لَيْمُونٌ', emoji: '🍋' }, { id: 24, word: 'مِفْتَاحٌ', emoji: '🔑' },
+  { id: 25, word: 'نَجْمَةٌ', emoji: '⭐' }, { id: 26, word: 'هِلالٌ', emoji: '🌙' },
+  { id: 27, word: 'وَرْدَةٌ', emoji: '🌹' }, { id: 28, word: 'يَدٌ', emoji: '🖐️' },
+  { id: 29, word: 'بَابٌ', emoji: '🚪' }, { id: 30, word: 'سَاعَةٌ', emoji: '⏰' },
+  { id: 31, word: 'مَدْرَسَةٌ', emoji: '🏫' }, { id: 32, word: 'طَبِيبٌ', emoji: '👨‍⚕️' },
+  { id: 33, word: 'مُسْتَشْفَى', emoji: '🏥' }, { id: 34, word: 'دَفْتَرٌ', emoji: '📓' },
+  { id: 35, word: 'مِمْحَاةٌ', emoji: '📝' }, { id: 36, word: 'شُرْطِيّ', emoji: '👮' },
+  { id: 37, word: 'مُمَرِّضَةٌ', emoji: '👩‍⚕️' }, { id: 38, word: 'مَطَرٌ', emoji: '🌧️' },
+  { id: 39, word: 'شَمْسٌ', emoji: '☀️' }, { id: 40, word: 'قَلْبٌ', emoji: '❤️' },
+  { id: 41, word: 'هَاتِفٌ', emoji: '📱' }, { id: 42, word: 'كِتَابٌ', emoji: '📖' }
 ];
+
+export interface MatchingLevel {
+  level: number;
+  label: string;
+  pairs: number;
+  studyTime: number;
+  gridCols: string;
+  exercises: MatchingPair[][];
+}
+
+export const matchingLevels: MatchingLevel[] = [
+  {
+    level: 1, label: 'سَهْلٌ', pairs: 4, studyTime: 5, gridCols: 'grid-cols-4',
+    exercises: [
+      allMatchingPairs.slice(0, 4),
+      allMatchingPairs.slice(4, 8),
+      allMatchingPairs.slice(8, 12),
+    ]
+  },
+  {
+    level: 2, label: 'مُتَوَسِّطٌ', pairs: 8, studyTime: 8, gridCols: 'grid-cols-4',
+    exercises: [
+      allMatchingPairs.slice(12, 20),
+      allMatchingPairs.slice(20, 28),
+    ]
+  },
+  {
+    level: 3, label: 'صَعْبٌ', pairs: 14, studyTime: 12, gridCols: 'grid-cols-7',
+    exercises: [
+      allMatchingPairs.slice(28, 42),
+    ]
+  },
+];
+
 
 // Data for "Word Scramble" exercise. (Expanded to 42 questions)
 export const scrambleQuestions: ScrambleQuestion[] = [
@@ -310,23 +322,22 @@ export const listenQuestions: ListenQuestion[] = [
   { id: 5, correctWord: 'خَالٌ', options: ['خَالٌ', 'حَالٌ', 'قَالَ'] },
 ];
 
-// Data for "Word Hunter" exercise.
-export const wordHunterQuestions: WordHunterQuestion[] = [
-  { id: 1, word: 'شَمْسٌ' },
-  { id: 2, word: 'قَمَرٌ' },
-  { id: 3, word: 'نَجْمٌ' },
-  { id: 4, word: 'بَحْرٌ' },
-  { id: 5, word: 'بَيْتٌ' },
-  { id: 6, word: 'مَاءٌ' },
-  { id: 7, word: 'كِتَابٌ' },
-  { id: 8, word: 'قَلَمٌ' },
+// New data for Word Hunter, with multiple exercises per level.
+export const wordHunterLevels: string[][][] = [
+  // Level 1: 3x3 grid
+  [ ['ماء', 'يد'], ['فم', 'أب'], ['دم', 'أخ'] ],
+  // Level 2: 5x5 grid
+  [ ['شمس', 'قمر', 'بحر'], ['نجم', 'ليل', 'نور'], ['سماء', 'غيم', 'ريح'] ],
+  // Level 3: 6x6 grid
+  [ ['بيت', 'باب', 'قلم', 'اسد'], ['نمر', 'جمل', 'فيل', 'كلب'], ['كرسي', 'طاولة', 'مكتب'] ],
+  // Level 4: 7x7 grid
+  [ ['قطار', 'طائرة', 'سيارة'], ['مدرسة', 'كتاب', 'دفتر'], ['طبيب', 'ممرضة', 'مشفى'] ],
 ];
 
-// Vocalized Arabic letters for the Word Hunter grid.
+// Base Arabic letters for the Word Hunter grid, without diacritics.
 export const arabicLetters: string[] = [
-    'أ', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص',
-    'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي',
-    'ا', 'ة', 'ى', 'ؤ', 'ء', 'ئ'
+    'ا', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص',
+    'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي', 'ء'
 ];
 
 // Data for the Story Spark generator.

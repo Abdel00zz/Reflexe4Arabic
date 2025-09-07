@@ -125,15 +125,6 @@ export interface ListenQuestion {
   options: string[]; // List of words to choose from, including the correct one.
 }
 
-/**
- * Interface for a question in the "Word Hunter" exercise.
- * The grid is now generated dynamically within the component.
- */
-export interface WordHunterQuestion {
-  id: number;
-  word: string; // The word to find.
-}
-
 // FIX: Add missing StoryWord interface for the StorySpark component.
 /**
  * Interface for a word used in the Story Spark generator.

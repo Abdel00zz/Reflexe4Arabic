@@ -1,13 +1,12 @@
 /**
  * @file This file contains the "Matching Game" (Memory Cards) component.
- * It has been transformed into a "Memory Challenge" with a pedagogical focus.
- * The game is structured into levels, and each level requires completing 6 separate exercises to advance.
- * This encourages mastery before increasing difficulty.
+ * This version allows the user to select a difficulty level from the start.
+ * Each level now consists of multiple exercises that the user progresses through.
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { MatchingPair } from '../types';
-import { matchingPairs } from '../data/arabicContent';
+import { matchingLevels, MatchingLevel } from '../data/arabicContent';
 
 // Props interface for the component.
 interface MatchingGameProps {
@@ -24,16 +23,6 @@ interface Card {
     isMatched: boolean;
 }
 
-// Game configuration for each level.
-const levels = [
-    { level: 1, pairs: 4, studyTime: 5, gridCols: 'grid-cols-4' },
-    { level: 2, pairs: 8, studyTime: 8, gridCols: 'grid-cols-4' },
-    { level: 3, pairs: 14, studyTime: 12, gridCols: 'grid-cols-7' },
-];
-
-// Define how many rounds must be completed to pass a level.
-const ROUNDS_PER_LEVEL = 6;
-
 // A utility function to shuffle an array.
 const shuffleArray = <T,>(array: T[]): T[] => {
   return [...array].sort(() => Math.random() - 0.5);
@@ -41,11 +30,11 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 export const MatchingGame: React.FC<MatchingGameProps> = ({ onAnswer }) => {
     // State to manage the overall game phase.
-    const [gamePhase, setGamePhase] = useState<'start' | 'study' | 'match' | 'round_complete' | 'level_complete' | 'game_complete'>('start');
-    // State for the current level number.
-    const [currentLevel, setCurrentLevel] = useState(1);
-    // State for the current round within a level.
-    const [currentRound, setCurrentRound] = useState(1);
+    const [gamePhase, setGamePhase] = useState<'level_select' | 'study' | 'match' | 'level_complete'>('level_select');
+    // State for the current level index.
+    const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
+    // State for the current exercise index within a level.
+    const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
     // State to hold the array of cards for the game.
     const [cards, setCards] = useState<Card[]>([]);
     // State to track the user's current selection.
@@ -57,22 +46,18 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onAnswer }) => {
     // State to count the number of moves (a move is flipping two cards).
     const [moves, setMoves] = useState(0);
 
-    const levelConfig = useMemo(() => levels[currentLevel - 1], [currentLevel]);
+    const levelConfig = useMemo(() => matchingLevels[currentLevelIndex], [currentLevelIndex]);
     
     /**
-     * Sets up or resets the game board for a given round.
+     * Sets up or resets the game board for a specific exercise within a level.
      */
-    const setupRound = (levelNumber: number) => {
-        const config = levels[levelNumber - 1];
-        if (!config) {
-            setGamePhase('game_complete');
-            return;
-        }
+    const setupExercise = (levelIdx: number, exerciseIdx: number) => {
+        const config = matchingLevels[levelIdx];
+        const exercisePairs = config.exercises[exerciseIdx];
+        if (!config || !exercisePairs) return;
 
-        const gamePairs = shuffleArray(matchingPairs).slice(0, config.pairs);
-        
         const gameCards: Card[] = [];
-        gamePairs.forEach(pair => {
+        exercisePairs.forEach(pair => {
             gameCards.push({
                 id: pair.id, instanceId: gameCards.length, type: 'word', content: pair.word, isFlipped: true, isMatched: false,
             });
@@ -89,6 +74,12 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onAnswer }) => {
         setGamePhase('study');
     }
     
+    const handleSelectLevel = (levelIdx: number) => {
+        setCurrentLevelIndex(levelIdx);
+        setCurrentExerciseIndex(0);
+        setupExercise(levelIdx, 0);
+    }
+
     // Effect to handle the countdown for the study phase.
     useEffect(() => {
         if (gamePhase === 'study') {
@@ -129,22 +120,20 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onAnswer }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selection]);
     
-    // Effect to check for round/level completion.
+    // Effect to check for exercise/level completion.
     useEffect(() => {
-        if (cards.length > 0 && cards.every(card => card.isMatched)) {
+        if (cards.length > 0 && gamePhase === 'match' && cards.every(card => card.isMatched)) {
             setTimeout(() => {
-                if (currentRound < ROUNDS_PER_LEVEL) {
-                    setGamePhase('round_complete');
+                const nextExerciseIndex = currentExerciseIndex + 1;
+                if (nextExerciseIndex < levelConfig.exercises.length) {
+                    setCurrentExerciseIndex(nextExerciseIndex);
+                    setupExercise(currentLevelIndex, nextExerciseIndex);
                 } else {
-                    if (currentLevel >= levels.length) {
-                        setGamePhase('game_complete');
-                    } else {
-                        setGamePhase('level_complete');
-                    }
+                    setGamePhase('level_complete');
                 }
-            }, 500);
+            }, 1200); // Wait a bit to show the completed board
         }
-    }, [cards, currentLevel, currentRound]);
+    }, [cards, gamePhase, currentExerciseIndex, currentLevelIndex, levelConfig]);
 
     const handleCardClick = (cardInstanceId: number) => {
         const clickedCard = cards.find(c => c.instanceId === cardInstanceId);
@@ -158,59 +147,52 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onAnswer }) => {
         if(newSelection.length === 2) setMoves(prev => prev + 1);
     };
     
-    const handleNextRound = () => {
-        setCurrentRound(prev => prev + 1);
-        setupRound(currentLevel);
+    const handleReplay = () => {
+        handleSelectLevel(currentLevelIndex);
     }
     
-    const handleNextLevel = () => {
-        const nextLevelNum = currentLevel + 1;
-        setCurrentLevel(nextLevelNum);
-        setCurrentRound(1);
-        setupRound(nextLevelNum);
-    }
-    
-    const handleRestart = () => {
-        setCurrentLevel(1);
-        setCurrentRound(1);
-        setGamePhase('start');
+    const handleChooseLevel = () => {
+        setGamePhase('level_select');
     }
 
     // RENDER LOGIC for intermediary screens.
-    if (['start', 'round_complete', 'level_complete', 'game_complete'].includes(gamePhase)) {
+    if (gamePhase === 'level_select') {
         return (
              <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6 text-center animate-fade-in">
-                {gamePhase === 'start' && <>
-                    <h2 className="text-4xl font-bold text-slate-700 mb-2">تَحَدِّي الذَّاكِرَةِ</h2>
-                    <p className="text-2xl text-slate-500 mb-6">أَكْمِلْ {ROUNDS_PER_LEVEL} تَمَارِينَ فِي كُلِّ مُسْتَوًى لِتَتَقَدَّمَ.</p>
-                    <button onClick={() => setupRound(1)} className="w-full text-white font-bold py-4 px-8 rounded-full text-2xl hover:scale-105 transition-transform bg-amber-500 hover:bg-amber-600">
-                        اِبْدَأِ التَّحَدِّي
-                    </button>
-                </>}
-                {gamePhase === 'round_complete' && <>
-                    <h2 className="text-4xl font-bold text-green-600 mb-2">✔️ تَمْرِينٌ مُكْتَمِلٌ ✔️</h2>
-                    <p className="text-2xl text-slate-500 mb-4">أَحْسَنْتَ! أَكْمَلْتَ التَّمْرِينَ فِي <span className="font-bold text-slate-700">{moves}</span> حَرَكَاتٍ.</p>
-                    <button onClick={handleNextRound} className="w-full text-white font-bold py-4 px-8 rounded-full text-2xl hover:scale-105 transition-transform bg-amber-500 hover:bg-amber-600">
-                        التَّمْرِينُ التَّالِي
-                    </button>
-                </>}
-                {gamePhase === 'level_complete' && <>
-                    <h2 className="text-4xl font-bold text-green-600 mb-2">🎉 مُسْتَوًى مُكْتَمِلٌ! 🎉</h2>
-                    <p className="text-2xl text-slate-500 mb-4">لَقَدْ أَكْمَلْتَ الْمُسْتَوَى {currentLevel}! هَلْ أَنْتَ مُسْتَعِدٌّ لِلْمُسْتَوَى التَّالِي؟</p>
-                    <button onClick={handleNextLevel} className="w-full text-white font-bold py-4 px-8 rounded-full text-2xl hover:scale-105 transition-transform bg-amber-500 hover:bg-amber-600">
-                        الْمُسْتَوَى التَّالِي
-                    </button>
-                </>}
-                 {gamePhase === 'game_complete' && <>
-                    <h2 className="text-4xl font-bold text-green-600 mb-2">🏆 اكْتَمَلَ التَّحَدِّي 🏆</h2>
-                    <p className="text-2xl text-slate-500 mb-4">لَقَدْ أَظْهَرْتَ ذَاكِرَةً قَوِيَّةً! عَمَلٌ رَائِعٌ!</p>
-                    <button onClick={handleRestart} className="w-full text-white font-bold py-4 px-8 rounded-full text-2xl hover:scale-105 transition-transform bg-amber-500 hover:bg-amber-600">
-                        الْعَبْ مَرَّةً أُخْرَى
-                    </button>
-                </>}
+                <h2 className="text-4xl font-bold text-slate-700 mb-2">تَحَدِّي الذَّاكِرَةِ</h2>
+                <p className="text-2xl text-slate-500 mb-6">اخْتَرِ مُسْتَوَى الصُّعُوبَةِ.</p>
+                <div className="flex flex-col gap-4">
+                  {matchingLevels.map((level, index) => (
+                      <button 
+                        key={level.level} 
+                        onClick={() => handleSelectLevel(index)} 
+                        className="w-full text-white font-bold py-4 px-8 rounded-full text-2xl hover:scale-105 transition-transform bg-amber-500 hover:bg-amber-600"
+                      >
+                          الْمُسْتَوَى {level.level} ({level.label})
+                      </button>
+                  ))}
+                </div>
             </div>
         )
     }
+
+    if (gamePhase === 'level_complete') {
+        return (
+            <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6 text-center animate-fade-in">
+                <h2 className="text-4xl font-bold text-green-600 mb-2">🎉 مُسْتَوًى مُكْتَمِلٌ! 🎉</h2>
+                <p className="text-2xl text-slate-500 mb-4">أَحْسَنْتَ! أَكْمَلْتَ جَمِيعَ تَمَارِينِ الْمُسْتَوَى {levelConfig.level}.</p>
+                <div className="flex flex-col gap-4">
+                  <button onClick={handleReplay} className="w-full text-white font-bold py-3 px-8 rounded-full text-xl hover:scale-105 transition-transform bg-amber-500 hover:bg-amber-600">
+                      إِعَادَةُ الْمُسْتَوَى
+                  </button>
+                  <button onClick={handleChooseLevel} className="w-full text-slate-700 bg-slate-200 font-bold py-3 px-8 rounded-full text-xl hover:scale-105 transition-transform hover:bg-slate-300">
+                      اخْتَرِ مُسْتَوًى آخَرَ
+                  </button>
+                </div>
+            </div>
+        );
+    }
+
 
     // RENDER LOGIC for the main game board.
     return (
@@ -218,12 +200,12 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ onAnswer }) => {
             <div className="text-center mb-3">
                 {gamePhase === 'study' ? (
                     <div className="animate-fade-in">
-                        <h2 className="text-3xl font-bold text-slate-700">مَرْحَلَةُ الدِّرَاسَةِ (الْمُسْتَوَى {currentLevel} - تَمْرِينٌ {currentRound}/{ROUNDS_PER_LEVEL})</h2>
+                        <h2 className="text-3xl font-bold text-slate-700">مَرْحَلَةُ الدِّرَاسَةِ (الْمُسْتَوَى {levelConfig.level})</h2>
                         <p className="text-5xl font-black text-amber-500">{studyTimer}</p>
                     </div>
                 ) : (
                     <div>
-                        <h2 className="text-3xl font-bold text-slate-700">الْمُسْتَوَى {currentLevel} - تَمْرِينٌ {currentRound}/{ROUNDS_PER_LEVEL}</h2>
+                        <h2 className="text-3xl font-bold text-slate-700">الْمُسْتَوَى {levelConfig.level} - التَّمْرِينُ {currentExerciseIndex + 1}/{levelConfig.exercises.length}</h2>
                         <p className="text-2xl text-slate-500">الْحَرَكَاتُ: <span className="font-bold">{moves}</span></p>
                     </div>
                 )}
