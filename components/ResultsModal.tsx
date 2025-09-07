@@ -22,6 +22,8 @@ const activityNames: { [key in ActivityType]?: string } = {
     [ActivityType.WORD_SCRAMBLE]: 'تَرْتِيبُ الْحُرُوفِ',
     [ActivityType.WHO_AM_I]: 'مَنْ أَكُونُ؟',
     [ActivityType.SENTENCE_BUILDER]: 'تَرْتِيبُ الْجُمْلَةِ',
+    [ActivityType.WORD_HUNTER]: 'صَائِدُ الْكَلِمَاتِ',
+    [ActivityType.FLASH_WORD]: 'كَلِمَةٌ فِي وَمْضَةٍ',
 };
 
 

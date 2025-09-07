@@ -19,6 +19,8 @@ import { WordScrambleExercise } from './components/WordScrambleExercise';
 import { WhoAmIExercise } from './components/WhoAmIExercise';
 import { SentenceBuilderExercise } from './components/SentenceBuilderExercise';
 import { CrosswordExercise } from './components/CrosswordExercise';
+import { WordHunterExercise } from './components/WordHunterExercise';
+import { FlashWordExercise } from './components/ShadowMatchExercise';
 
 const App: React.FC = () => {
   // State to manage the currently active screen/activity. Defaults to the main menu.
@@ -109,6 +111,12 @@ const App: React.FC = () => {
         break;
       case ActivityType.SENTENCE_BUILDER:
         exerciseComponent = <SentenceBuilderExercise onAnswer={createAnswerHandler(ActivityType.SENTENCE_BUILDER)} />;
+        break;
+      case ActivityType.WORD_HUNTER:
+        exerciseComponent = <WordHunterExercise onAnswer={createAnswerHandler(ActivityType.WORD_HUNTER)} />;
+        break;
+      case ActivityType.FLASH_WORD:
+        exerciseComponent = <FlashWordExercise onAnswer={createAnswerHandler(ActivityType.FLASH_WORD)} />;
         break;
       case ActivityType.MENU:
       default:

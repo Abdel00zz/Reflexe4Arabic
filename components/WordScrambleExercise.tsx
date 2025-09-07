@@ -131,21 +131,33 @@ export const WordScrambleExercise: React.FC<WordScrambleExerciseProps> = ({ onAn
       <h2 className="text-4xl sm:text-5xl font-bold text-slate-700 mb-2 text-center">رَتِّبِ الْحُرُوفَ لِتُكَوِّنَ كَلِمَةً:</h2>
       {currentQuestion.hint && <p className="text-center text-slate-500 mb-4 text-xl sm:text-2xl">تَلْمِيحٌ: {currentQuestion.hint}</p>}
       
-      {/* Area where the user builds the word */}
-      <div dir="rtl" className="flex justify-center items-center gap-2 sm:gap-3 mb-6 bg-slate-100 p-2 sm:p-4 rounded-lg min-h-[80px] sm:min-h-[120px]">
-          {builtWord.map((tile) => (
-              <div key={tile.id} className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center bg-white rounded-lg shadow text-4xl sm:text-5xl font-bold text-rose-600">
-                  {tile.letter}
-              </div>
-          ))}
-          {/* Placeholder boxes for remaining letters */}
-          {Array(placeholderCount).fill(0).map((_, index) => (
-               <div key={index} className="w-20 h-20 sm:w-24 sm:h-24 bg-slate-200 rounded-lg shadow-inner"></div>
-          ))}
+      {/* Area where the user builds the word + Backspace button */}
+      <div className="flex items-center gap-4 mb-6">
+        <button 
+            onClick={handleBackspace} 
+            disabled={feedback !== null || builtWord.length === 0} 
+            className="flex-shrink-0 w-24 h-24 flex items-center justify-center bg-slate-200 text-slate-600 rounded-xl shadow-md hover:bg-slate-300 transition-colors disabled:opacity-50"
+            data-tooltip-id="app-tooltip"
+            data-tooltip-content="مَسْحُ الْحَرْفِ الْأَخِيرِ"
+        >
+            <BsBackspaceFill className="h-10 w-10" />
+        </button>
+        <div dir="rtl" className="flex-grow flex justify-center items-center gap-2 sm:gap-3 bg-slate-100 p-4 sm:p-6 rounded-lg min-h-[120px] border-2 border-dashed border-slate-200">
+            {builtWord.map((tile) => (
+                <div key={tile.id} className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center bg-white rounded-lg shadow text-4xl sm:text-5xl font-bold text-rose-600">
+                    {tile.letter}
+                </div>
+            ))}
+            {/* Placeholder boxes for remaining letters */}
+            {Array(placeholderCount).fill(0).map((_, index) => (
+                 <div key={index} className="w-20 h-20 sm:w-24 sm:h-24 bg-slate-200 rounded-lg shadow-inner"></div>
+            ))}
+        </div>
       </div>
 
+
       {/* Area with available letter tiles */}
-      <div dir="rtl" className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-6 min-h-[80px] sm:min-h-[120px]">
+      <div dir="rtl" className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-6 min-h-[120px]">
         {availableLetters.map((tile) => (
           <button
             key={tile.id}
@@ -157,19 +169,6 @@ export const WordScrambleExercise: React.FC<WordScrambleExerciseProps> = ({ onAn
           </button>
         ))}
       </div>
-
-      {/* Backspace Button with a tooltip */}
-       <div className="flex justify-center">
-            <button 
-                onClick={handleBackspace} 
-                disabled={feedback !== null || builtWord.length === 0} 
-                className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center bg-slate-200 text-slate-600 rounded-xl shadow-md hover:bg-slate-300 transition-colors disabled:opacity-50"
-                data-tooltip-id="app-tooltip"
-                data-tooltip-content="مَسْحُ الْحَرْفِ الْأَخِيرِ"
-            >
-                <BsBackspaceFill className="h-10 w-10 sm:h-12 sm:w-12" />
-            </button>
-       </div>
 
       {/* Feedback Section */}
       {feedback && (

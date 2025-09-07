@@ -8,8 +8,9 @@ import React from 'react';
 import { ActivityType } from '../types';
 // Import modern icons from react-icons
 import { BsPencilFill, BsUiChecks, BsShuffle, BsChatQuoteFill } from 'react-icons/bs';
-import { FaQuestionCircle, FaTrophy, FaSearch } from 'react-icons/fa';
+import { FaQuestionCircle, FaTrophy, FaSearch, FaSearchPlus } from 'react-icons/fa';
 import { GiCardRandom } from "react-icons/gi";
+import { IoIosFlash } from 'react-icons/io';
 
 interface MainMenuProps {
   onSelectActivity: (activity: ActivityType) => void;
@@ -25,6 +26,8 @@ const menuItems = [
     { type: ActivityType.WORD_SCRAMBLE, icon: <BsShuffle />, label: 'رَتِّبِ الْحُرُوفَ', color: 'bg-rose-500' },
     { type: ActivityType.WHO_AM_I, icon: <FaSearch />, label: 'مَنْ أَكُونُ؟', color: 'bg-teal-500' },
     { type: ActivityType.SENTENCE_BUILDER, icon: <BsChatQuoteFill />, label: 'رَتِّبِ الْجُمْلَةَ', color: 'bg-indigo-500' },
+    { type: ActivityType.WORD_HUNTER, icon: <FaSearchPlus />, label: 'صَائِدُ الْكَلِمَاتِ', color: 'bg-orange-500' },
+    { type: ActivityType.FLASH_WORD, icon: <IoIosFlash />, label: 'كَلِمَةٌ فِي وَمْضَةٍ', color: 'bg-lime-500' },
 ];
 
 export const MainMenu: React.FC<MainMenuProps> = ({ onSelectActivity, onOpenHelp, onOpenResults }) => {

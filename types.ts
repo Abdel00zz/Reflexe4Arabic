@@ -14,6 +14,9 @@ export enum ActivityType {
   WORD_SCRAMBLE = 'WORD_SCRAMBLE',
   WHO_AM_I = 'WHO_AM_I', // Replaced CROSSWORD
   SENTENCE_BUILDER = 'SENTENCE_BUILDER',
+  // New cognitive activities
+  WORD_HUNTER = 'WORD_HUNTER',
+  FLASH_WORD = 'FLASH_WORD', // Replaced SHADOW_MATCH with a new reading speed game.
 }
 
 /**
@@ -77,6 +80,17 @@ export interface WhoAmIQuestion {
   options: string[];
 }
 
+// FIX: Add missing StoryLogicQuestion interface for the StoryLogicExercise component.
+/**
+ * Interface for a question in the "Story Logic" exercise.
+ */
+export interface StoryLogicQuestion {
+  id: number;
+  emojis: string[];
+  correctOrder: string[];
+  storySentence: string;
+}
+
 // FIX: Add missing CrosswordClue interface for the CrosswordExercise component.
 /**
  * Interface for a clue in the Crossword exercise.
@@ -90,15 +104,17 @@ export interface CrosswordClue {
   col: number;
 }
 
-
 /**
- * Interface for a word used in the Story Spark component.
+ * Interface for a question in the "Flash Word" exercise.
+ * This tests rapid word recognition.
  */
-export interface StoryWord {
+export interface FlashWordQuestion {
   id: number;
   word: string;
   emoji: string;
+  options: string[]; // The correct word plus three distractors.
 }
+
 
 /**
  * Interface for a question in the "Listen and Choose" exercise.
@@ -107,6 +123,25 @@ export interface ListenQuestion {
   id: number;
   correctWord: string; // The word to be spoken.
   options: string[]; // List of words to choose from, including the correct one.
+}
+
+/**
+ * Interface for a question in the "Word Hunter" exercise.
+ * The grid is now generated dynamically within the component.
+ */
+export interface WordHunterQuestion {
+  id: number;
+  word: string; // The word to find.
+}
+
+// FIX: Add missing StoryWord interface for the StorySpark component.
+/**
+ * Interface for a word used in the Story Spark generator.
+ */
+export interface StoryWord {
+    id: number;
+    word: string;
+    emoji: string;
 }
 
 /**

@@ -35,6 +35,16 @@
       .app-tooltip.react-tooltip-show {
         opacity: 1 !important;
       }
+      /* Animation for the new Flash Word game */
+      @keyframes ping-once {
+        75%, 100% {
+          transform: scale(1.5);
+          opacity: 0;
+        }
+      }
+      .animate-ping-once {
+        animation: ping-once 0.7s cubic-bezier(0, 0, 0.2, 1);
+      }
     </style>
   <script type="importmap">
 {
