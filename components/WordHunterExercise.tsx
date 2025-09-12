@@ -196,10 +196,10 @@ export const WordHunterExercise: React.FC<WordHunterExerciseProps> = ({ onAnswer
   };
 
   const getCellSizeClass = (gridSize: number) => {
-    if (gridSize <= 3) return 'w-24 h-24 text-5xl';
-    if (gridSize <= 5) return 'w-20 h-20 text-4xl';
-    if (gridSize <= 6) return 'w-16 h-16 text-3xl';
-    return 'w-14 h-14 text-2xl'; // For 7x7
+    if (gridSize <= 3) return 'w-28 h-28 text-6xl';
+    if (gridSize <= 5) return 'w-24 h-24 text-5xl';
+    if (gridSize <= 6) return 'w-20 h-20 text-4xl';
+    return 'w-16 h-16 text-3xl'; // For 7x7
   };
 
   if (gamePhase === 'level_select') {

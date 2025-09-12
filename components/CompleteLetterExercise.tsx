@@ -128,7 +128,7 @@ export const CompleteLetterExercise: React.FC<CompleteLetterExerciseProps> = ({ 
                   <React.Fragment key={index}>
                       {part}
                       {index < currentQuestion.wordHint.split('_').length - 1 && (
-                          <span className={`inline-block w-20 sm:w-28 text-center border-b-8 ${feedback ? 'border-sky-500' : 'border-slate-300'}`}>
+                          <span className={`inline-block w-24 sm:w-32 text-center border-b-8 ${feedback ? 'border-sky-500' : 'border-slate-300'}`}>
                               {feedback === 'correct' ? selectedOption : feedback === 'incorrect' ? <span className="text-red-500">{selectedOption}</span> : '?'}
                           </span>
                       )}
@@ -160,7 +160,7 @@ export const CompleteLetterExercise: React.FC<CompleteLetterExerciseProps> = ({ 
            <p className="text-3xl sm:text-4xl text-slate-600">اَلْكَلِمَةُ هِيَ: <span className="font-bold text-sky-600">{fullWord}</span></p>
             <button 
               onClick={handleNextQuestion} 
-              className="mt-4 bg-sky-500 text-white font-bold py-2 px-6 sm:py-2 sm:px-8 rounded-full hover:bg-sky-600 transition-colors text-xl sm:text-2xl" 
+              className="mt-6 bg-sky-500 text-white font-bold py-3 px-8 sm:py-4 sm:px-10 rounded-full hover:bg-sky-600 transition-colors text-2xl sm:text-3xl" 
             >
                 اَلسُّؤَالُ التَّالِي
             </button>

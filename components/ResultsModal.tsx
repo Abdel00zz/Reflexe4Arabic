@@ -24,6 +24,8 @@ const activityNames: { [key in ActivityType]?: string } = {
     [ActivityType.SENTENCE_BUILDER]: 'تَرْتِيبُ الْجُمْلَةِ',
     [ActivityType.WORD_HUNTER]: 'صَائِدُ الْكَلِمَاتِ',
     [ActivityType.FLASH_WORD]: 'كَلِمَةٌ فِي وَمْضَةٍ',
+    [ActivityType.DAYS_OF_WEEK]: 'تَحَدِّي أَيَّامِ الْأُسْبُوعِ',
+    [ActivityType.OPPOSITES_MATCH]: 'تَطَابُقُ الْأَضْدَادِ',
 };
 
 

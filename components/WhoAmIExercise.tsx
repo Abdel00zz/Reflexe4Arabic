@@ -144,8 +144,8 @@ export const WhoAmIExercise: React.FC<WhoAmIExerciseProps> = ({ onAnswer }) => {
 
       <h2 className="text-4xl sm:text-5xl font-bold text-slate-700 mb-6 text-center">مَنْ أَكُونُ؟</h2>
       
-      <div className="bg-slate-100 p-6 rounded-lg mb-6">
-          <p className="text-3xl text-center text-slate-800 font-semibold leading-relaxed">{currentQuestion.riddle}</p>
+      <div className="bg-slate-100 p-6 sm:p-8 rounded-lg mb-6">
+          <p className="text-4xl text-center text-slate-800 font-semibold leading-relaxed">{currentQuestion.riddle}</p>
       </div>
       
       <form onSubmit={handleSubmit} className="flex gap-2 sm:gap-4 mb-6">
@@ -155,11 +155,11 @@ export const WhoAmIExercise: React.FC<WhoAmIExerciseProps> = ({ onAnswer }) => {
               onChange={(e) => setUserAnswer(e.target.value)}
               disabled={!!feedback || showSuggestions}
               placeholder={showSuggestions ? "اِخْتَر مِنَ الْأَسْفَلِ" : "اُكْتُبْ إِجَابَتَكَ هُنَا..."}
-              className="flex-grow p-4 text-2xl rounded-lg border-2 border-slate-300 focus:border-teal-500 focus:ring-teal-500 disabled:bg-slate-100"
+              className="flex-grow p-5 text-3xl rounded-lg border-2 border-slate-300 focus:border-teal-500 focus:ring-teal-500 disabled:bg-slate-100"
               dir="rtl"
           />
-          <button type="submit" disabled={!userAnswer || !!feedback || showSuggestions} className="bg-teal-500 text-white font-bold p-4 rounded-lg hover:bg-teal-600 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed flex-shrink-0">
-              <FaPaperPlane className="h-6 w-6"/>
+          <button type="submit" disabled={!userAnswer || !!feedback || showSuggestions} className="bg-teal-500 text-white font-bold p-5 rounded-lg hover:bg-teal-600 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed flex-shrink-0">
+              <FaPaperPlane className="h-8 w-8"/>
           </button>
       </form>
       
@@ -172,7 +172,7 @@ export const WhoAmIExercise: React.FC<WhoAmIExerciseProps> = ({ onAnswer }) => {
                         key={option} 
                         onClick={() => handleSuggestionClick(option)} 
                         disabled={!!feedback || submittedOptions.includes(option)}
-                        className={`p-4 text-2xl font-bold rounded-xl shadow-md transition-all duration-300 border-4 ${getButtonClass(option)}`}
+                        className={`p-5 text-3xl font-bold rounded-xl shadow-md transition-all duration-300 border-4 ${getButtonClass(option)}`}
                       >
                           {option}
                       </button>
@@ -182,7 +182,7 @@ export const WhoAmIExercise: React.FC<WhoAmIExerciseProps> = ({ onAnswer }) => {
       )}
       
       {feedback && (
-          <div className="text-center animate-fade-in mt-4 p-5 bg-slate-50 rounded-lg">
+          <div className="text-center animate-fade-in mt-6 p-5 bg-slate-50 rounded-lg">
               <p className={`text-3xl font-bold mb-4 ${feedback === 'correct' ? 'text-green-600' : 'text-red-600'}`}>
                   {feedback === 'correct' ? correctMessage : `إِجَابَةٌ خَاطِئَةٌ! اَلْإِجَابَةُ هِيَ: "${currentQuestion.answer}"`}
               </p>

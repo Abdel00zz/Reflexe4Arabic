@@ -21,6 +21,8 @@ import { SentenceBuilderExercise } from './components/SentenceBuilderExercise';
 import { CrosswordExercise } from './components/CrosswordExercise';
 import { WordHunterExercise } from './components/WordHunterExercise';
 import { FlashWordExercise } from './components/ShadowMatchExercise';
+import { DaysOfWeekExercise } from './components/DaysOfWeekExercise';
+import { OppositesMatchExercise } from './components/OppositesMatchExercise';
 
 const App: React.FC = () => {
   // State to manage the currently active screen/activity. Defaults to the main menu.
@@ -117,6 +119,12 @@ const App: React.FC = () => {
         break;
       case ActivityType.FLASH_WORD:
         exerciseComponent = <FlashWordExercise onAnswer={createAnswerHandler(ActivityType.FLASH_WORD)} />;
+        break;
+      case ActivityType.DAYS_OF_WEEK:
+        exerciseComponent = <DaysOfWeekExercise onAnswer={createAnswerHandler(ActivityType.DAYS_OF_WEEK)} />;
+        break;
+      case ActivityType.OPPOSITES_MATCH:
+        exerciseComponent = <OppositesMatchExercise onAnswer={createAnswerHandler(ActivityType.OPPOSITES_MATCH)} />;
         break;
       case ActivityType.MENU:
       default:

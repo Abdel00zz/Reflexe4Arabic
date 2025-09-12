@@ -118,16 +118,16 @@ export const CompleteWordExercise: React.FC<CompleteWordExerciseProps> = ({ onAn
           <div className="h-3 bg-emerald-500 rounded-full transition-all duration-300" style={{width: `${((currentQuestionIndex + 1) / questions.length) * 100}%`}}></div>
       </div>
       
-      <h2 className="text-4xl sm:text-5xl font-bold text-slate-700 mb-4 text-center">أَكْمِلِ الْجُمْلَةَ:</h2>
+      <h2 className="text-4xl sm:text-5xl font-bold text-slate-700 mb-6 text-center">أَكْمِلِ الْجُمْلَةَ:</h2>
       
       {/* Display for the sentence hint with a blank space */}
-      <div className="text-center mb-6 bg-slate-100 p-4 sm:p-6 rounded-lg">
-           <p className="text-4xl sm:text-6xl font-bold text-slate-800 leading-relaxed">
+      <div className="text-center mb-8 bg-slate-100 p-6 sm:p-8 rounded-lg">
+           <p className="text-5xl sm:text-7xl font-bold text-slate-800 leading-relaxed">
               {currentQuestion.sentenceHint.split('___').map((part, index) => (
                   <React.Fragment key={index}>
                       {part}
                       {index < currentQuestion.sentenceHint.split('___').length - 1 && (
-                          <span className="inline-block text-center border-b-8 border-dashed border-slate-300 min-w-[150px] sm:min-w-[200px] mx-2 sm:mx-4 p-1 sm:p-2">
+                          <span className="inline-block text-center border-b-8 border-dashed border-slate-300 min-w-[200px] sm:min-w-[250px] mx-2 sm:mx-4 p-1 sm:p-2">
                              {feedback ? <span className={feedback === 'correct' ? 'text-green-600' : 'text-red-600'}>{selectedOption}</span> : ''}
                           </span>
                       )}
@@ -137,13 +137,13 @@ export const CompleteWordExercise: React.FC<CompleteWordExerciseProps> = ({ onAn
       </div>
 
       {/* Options Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6">
         {shuffledOptions.map((option) => (
           <button
             key={option}
             onClick={() => handleOptionClick(option)}
             disabled={!!feedback}
-            className={`p-4 sm:p-6 text-2xl sm:text-4xl font-bold rounded-xl shadow-md transition-all duration-300 border-4 ${getButtonClass(option)}`}
+            className={`p-5 sm:p-8 text-3xl sm:text-5xl font-bold rounded-xl shadow-md transition-all duration-300 border-4 ${getButtonClass(option)}`}
           >
             {option}
           </button>
@@ -152,14 +152,14 @@ export const CompleteWordExercise: React.FC<CompleteWordExerciseProps> = ({ onAn
 
       {/* Feedback Section */}
       {feedback && (
-        <div className="text-center animate-fade-in mt-4 p-4 sm:p-5 bg-slate-50 rounded-lg">
+        <div className="text-center animate-fade-in mt-6 p-5 sm:p-6 bg-slate-50 rounded-lg">
            <p className={`text-3xl sm:text-4xl font-bold mb-4 ${feedback === 'correct' ? 'text-green-600' : 'text-red-600'}`}>
               {feedback === 'correct' ? correctMessage : `لِلْأَسَفِ! اَلْإِجَابَةُ الصَّحِيحَةُ هِيَ "${currentQuestion.correctWord}"`}
            </p>
            <p className="text-3xl sm:text-4xl text-slate-600">اَلْجُمْلَةُ الْكَامِلَةُ: <span className="font-bold text-emerald-600">{fullSentence}</span></p>
            <button 
               onClick={handleNextQuestion} 
-              className="mt-4 bg-emerald-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-emerald-600 transition-colors text-xl sm:text-2xl"
+              className="mt-6 bg-emerald-500 text-white font-bold py-3 px-8 sm:py-4 sm:px-10 rounded-full hover:bg-emerald-600 transition-colors text-2xl sm:text-3xl"
             >
                 اَلسُّؤَالُ التَّالِي
             </button>

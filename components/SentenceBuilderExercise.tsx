@@ -175,20 +175,20 @@ export const SentenceBuilderExercise: React.FC<SentenceBuilderExerciseProps> = (
         <button 
             onClick={handleBackspace} 
             disabled={feedback !== null || builtSentence.length === 0} 
-            className="flex-shrink-0 w-24 h-24 flex items-center justify-center bg-slate-200 text-slate-600 rounded-xl shadow-md hover:bg-slate-300 transition-colors disabled:opacity-50"
+            className="flex-shrink-0 w-28 h-28 flex items-center justify-center bg-slate-200 text-slate-600 rounded-xl shadow-md hover:bg-slate-300 transition-colors disabled:opacity-50"
             data-tooltip-id="app-tooltip"
             data-tooltip-content="إِلْغَاءُ كَلِمَةٍ"
             aria-label="إِلْغَاءُ كَلِمَةٍ"
         >
-            <BsBackspaceFill className="h-10 w-10" />
+            <BsBackspaceFill className="h-12 w-12" />
         </button>
-        <div dir="rtl" className="flex-grow flex flex-wrap justify-center items-center gap-2 sm:gap-4 bg-slate-100 p-4 sm:p-6 rounded-lg min-h-[120px] border-2 border-dashed">
+        <div dir="rtl" className="flex-grow flex flex-wrap justify-center items-center gap-3 sm:gap-4 bg-slate-100 p-4 sm:p-6 rounded-lg min-h-[140px] border-2 border-dashed">
             {builtSentence.length > 0 ? (
               builtSentence.map((tile) => (
                   <button 
                     key={tile.id} 
                     onClick={() => handleBuiltWordClick(tile)} 
-                    className={`px-4 py-2 sm:px-6 sm:py-3 rounded-lg shadow text-2xl sm:text-3xl font-bold transition-all duration-200 ${
+                    className={`px-6 py-3 sm:px-8 sm:py-4 rounded-lg shadow text-3xl sm:text-4xl font-bold transition-all duration-200 ${
                         selectedTile?.id === tile.id 
                         ? 'bg-yellow-300 text-yellow-900 ring-4 ring-yellow-400 scale-105' 
                         : 'bg-white text-indigo-600 cursor-pointer'
@@ -198,20 +198,20 @@ export const SentenceBuilderExercise: React.FC<SentenceBuilderExerciseProps> = (
                   </button>
               ))
             ) : (
-              <span className="text-slate-400 text-xl font-semibold">اِبْدَأْ بِبِنَاءِ جُمْلَتِكَ هُنَا</span>
+              <span className="text-slate-400 text-2xl font-semibold">اِبْدَأْ بِبِنَاءِ جُمْلَتِكَ هُنَا</span>
             )}
         </div>
       </div>
 
 
       {/* Area with available word tiles */}
-      <div dir="rtl" className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-4 min-h-[120px]">
+      <div dir="rtl" className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-4 min-h-[140px]">
         {availableWords.map((tile) => (
           <button
             key={tile.id}
             onClick={() => handleWordClick(tile)}
             disabled={feedback !== null}
-            className="px-4 py-2 sm:px-6 sm:py-3 text-2xl sm:text-3xl font-bold rounded-lg shadow-md transition-all duration-200 border-4 bg-white hover:bg-indigo-100 border-slate-300 hover:border-indigo-500"
+            className="px-6 py-3 sm:px-8 sm:py-4 text-3xl sm:text-4xl font-bold rounded-lg shadow-md transition-all duration-200 border-4 bg-white hover:bg-indigo-100 border-slate-300 hover:border-indigo-500"
           >
             {tile.word}
           </button>
@@ -223,7 +223,7 @@ export const SentenceBuilderExercise: React.FC<SentenceBuilderExerciseProps> = (
         <button 
             onClick={checkAnswer} 
             disabled={feedback !== null || availableWords.length > 0}
-            className="bg-indigo-500 text-white font-bold py-3 px-8 rounded-full hover:bg-indigo-600 transition-colors text-xl sm:text-2xl disabled:bg-slate-300 disabled:cursor-not-allowed"
+            className="bg-indigo-500 text-white font-bold py-4 px-10 rounded-full hover:bg-indigo-600 transition-colors text-2xl sm:text-3xl disabled:bg-slate-300 disabled:cursor-not-allowed"
         >
             تَحَقَّقْ مِنَ الْإِجَابَةِ
         </button>
@@ -231,14 +231,14 @@ export const SentenceBuilderExercise: React.FC<SentenceBuilderExerciseProps> = (
 
       {/* Feedback Section */}
       {feedback && (
-        <div className="text-center animate-fade-in mt-4 p-4 sm:p-5 bg-slate-50 rounded-lg">
+        <div className="text-center animate-fade-in mt-6 p-4 sm:p-5 bg-slate-50 rounded-lg">
            <p className={`text-3xl sm:text-4xl font-bold mb-4 ${feedback === 'correct' ? 'text-green-600' : 'text-red-600'}`}>
               {feedback === 'correct' ? correctMessage : 'حَاوِلْ مَرَّةً أُخْرَى!'}
            </p>
            <p className="text-3xl sm:text-4xl text-slate-600">اَلْجُمْلَةُ الصَّحِيحَةُ هِيَ: <span className="font-bold text-indigo-600">{currentQuestion.correctSentence}</span></p>
            <button 
               onClick={handleNextQuestion} 
-              className="mt-4 bg-indigo-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-indigo-600 transition-colors text-xl sm:text-2xl"
+              className="mt-6 bg-indigo-500 text-white font-bold py-3 px-8 sm:py-4 sm:px-10 rounded-full hover:bg-indigo-600 transition-colors text-2xl sm:text-3xl"
             >
                 اَلسُّؤَالُ التَّالِي
             </button>

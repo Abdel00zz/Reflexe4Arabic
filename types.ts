@@ -17,6 +17,8 @@ export enum ActivityType {
   // New cognitive activities
   WORD_HUNTER = 'WORD_HUNTER',
   FLASH_WORD = 'FLASH_WORD', // Replaced SHADOW_MATCH with a new reading speed game.
+  DAYS_OF_WEEK = 'DAYS_OF_WEEK',
+  OPPOSITES_MATCH = 'OPPOSITES_MATCH',
 }
 
 /**
@@ -136,6 +138,15 @@ export interface StoryWord {
 }
 
 /**
+ * Interface for a pair of opposite words for the Opposites Match game.
+ */
+export interface OppositesPair {
+  id: number;
+  word1: string;
+  word2: string;
+}
+
+/**
  * Interface for tracking results for a single activity.
  */
 export interface ActivityResult {
@@ -149,4 +160,51 @@ export interface ActivityResult {
  */
 export type DetailedResults = {
   [key in ActivityType]?: ActivityResult;
+}
+
+// --- New Types for Enhanced Games ---
+
+/**
+ * Enum for the different types of challenges in the "Days of the Week" game.
+ */
+export enum DaysOfWeekExerciseType {
+  ORDER_DRAG_DROP = 'ORDER_DRAG_DROP',
+  MULTIPLE_CHOICE = 'MULTIPLE_CHOICE',
+}
+
+/**
+ * Interface for a single exercise in the "Days of the Week" game.
+ */
+export interface DaysOfWeekExercise {
+  id: number;
+  type: DaysOfWeekExerciseType;
+  prompt?: string; // For MULTIPLE_CHOICE, e.g., "Which day comes after Monday?"
+  correctAnswer?: string;
+  options?: string[];
+}
+
+/**
+ * Enum for the different types of challenges in the "Opposites Match" game.
+ */
+export enum OppositesExerciseType {
+  CONNECT_WORDS = 'CONNECT_WORDS',
+  MULTIPLE_CHOICE = 'MULTIPLE_CHOICE',
+  FILL_IN_THE_BLANK = 'FILL_IN_THE_BLANK',
+}
+
+/**
+ * Interface for a single exercise in the "Opposites Match" game.
+ */
+export interface OppositesExercise {
+  id: number;
+  type: OppositesExerciseType;
+  // For CONNECT_WORDS
+  pairs?: OppositesPair[];
+  // For MULTIPLE_CHOICE
+  promptWord?: string;
+  // For FILL_IN_THE_BLANK
+  sentenceHint?: string; // e.g., "الفيل كبير، لكن الفأر ___."
+  // Common for MCQs and Fill-in-the-blank
+  correctAnswer?: string;
+  options?: string[];
 }

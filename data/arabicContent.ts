@@ -16,6 +16,11 @@ import {
   FlashWordQuestion,
   StoryWord,
   StoryLogicQuestion,
+  OppositesPair,
+  DaysOfWeekExercise,
+  DaysOfWeekExerciseType,
+  OppositesExercise,
+  OppositesExerciseType,
 } from '../types';
 
 // Data for "Complete the Letter" exercise. (Expanded to 42 questions)
@@ -228,7 +233,7 @@ export const sentenceQuestions: SentenceQuestion[] = [
   { id: 8, correctSentence: 'الْمُعَلِّمُ يَشْرَحُ الدَّرْسَ', scrambledWords: ['الدَّرْسَ', 'يَشْرَحُ', 'الْمُعَلِّمُ'] },
   { id: 9, correctSentence: 'تَذْهَبُ الْبِنْتُ إِلَى الْمَدْرَسَةِ', scrambledWords: ['إِلَى', 'الْمَدْرَسَةِ', 'تَذْهَبُ', 'الْبِنْتُ'] },
   { id: 10, correctSentence: 'الْأَسَدُ مَلِكُ الْغَابَةِ', scrambledWords: ['الْغَابَةِ', 'مَلِكُ', 'الْأَسَدُ'] },
-  { id: 11, correctSentence: 'أَنَا أَكْتُبُ الْوَاجِبَ', scrambledWords: ['الْوَاجِبَ', 'أَنَا', 'أَكْتُبُ'] },
+  { id: 11, correctSentence: 'أَنَا أَكْتُبُ الْوَاجِبَ', scrambledWords: ['الْوَاجِبَ', 'أَنَا', 'أَكْتُBُ'] },
   { id: 12, correctSentence: 'السَّيَّارَةُ سَرِيعَةٌ جِدًّا', scrambledWords: ['سَرِيعَةٌ', 'جِدًّا', 'السَّيَّارَةُ'] },
   { id: 13, correctSentence: 'الْوَرْدَةُ حَمْرَاءُ', scrambledWords: ['حَمْرَاءُ', 'الْوَرْدَةُ'] },
   { id: 14, correctSentence: 'الطَّائِرُ يُغَرِّدُ فَوْقَ الشَّجَرَةِ', scrambledWords: ['الشَّجَرَةِ', 'يُغَرِّدُ', 'فَوْقَ', 'الطَّائِرُ'] },
@@ -282,7 +287,7 @@ export const crosswordData = {
     clues: [
         { number: 1, clue: 'نَأْكُلُهُ فِي الصَّبَاحِ', answer: 'خُبْزٌ', direction: 'across', row: 0, col: 6 },
         { number: 2, clue: 'عَاصِمَةُ مِصْرَ', answer: 'قَاهِرَةٌ', direction: 'across', row: 2, col: 0 },
-        { number: 3, clue: 'مَكَانُ التَّعَلُّمِ', answer: 'مَدْرَسَةٌ', direction: 'across', row: 5, col: 4 },
+        { number: 3, clue: 'مَكَانُ التَّعَلُُّمِ', answer: 'مَدْرَسَةٌ', direction: 'across', row: 5, col: 4 },
         { number: 4, clue: 'لَوْنُ السَّمَاءِ', answer: 'أَزْرَقُ', direction: 'down', row: 0, col: 8 },
         { number: 5, clue: 'حَيَوَانٌ أَلِيفٌ يَقُولُ "مواء"', answer: 'قِطٌّ', direction: 'down', row: 2, col: 0 },
         { number: 6, clue: 'نَكْتُبُ بِهِ', answer: 'قَلَمٌ', direction: 'down', row: 4, col: 5 },
@@ -359,4 +364,45 @@ export const storyLogicQuestions: StoryLogicQuestion[] = [
   { id: 3, emojis: ['👨', '👶', '👦'], correctOrder: ['👶', '👦', '👨'], storySentence: 'كَانَ طِفْلًا رَضِيعًا، ثُمَّ أَصْبَحَ وَلَدًا، ثُمَّ كَبُرَ لِيُصْبِحَ رَجُلًا.' },
   { id: 4, emojis: ['📖', '✏️', '🤔'], correctOrder: ['🤔', '✏️', '📖'], storySentence: 'فَكَّرَ فِي فِكْرَةٍ، فَكَتَبَهَا بِالْقَلَمِ، ثُمَّ تَحَوَّلَتْ إِلَى كِتَابٍ.' },
   { id: 5, emojis: ['😴', '☀️', '🌙'], correctOrder: ['☀️', '🌙', '😴'], storySentence: 'أَشْرَقَتِ الشَّمْسُ فِي النَّهَارِ، ثُمَّ ظَهَرَ الْقَمَرُ فِي اللَّيْلِ، وَحَانَ وَقْتُ النَّوْمِ.' },
+];
+
+// --- New Data for New Games ---
+
+// Data for "Days of the Week" challenge. The week now starts on Monday.
+export const daysOfWeek: string[] = [
+  'الْاِثْنَيْنِ', 'الثُّلَاثَاءُ', 'الْأَرْبِعَاءُ', 'الْخَمِيسُ', 'الْجُمُعَةُ', 'السَّبْتُ', 'الْأَحَدُ'
+];
+
+// Exercises updated to reflect Monday as the start of the week.
+export const daysOfWeekExercises: DaysOfWeekExercise[] = [
+  { id: 1, type: DaysOfWeekExerciseType.ORDER_DRAG_DROP },
+  { id: 2, type: DaysOfWeekExerciseType.MULTIPLE_CHOICE, prompt: 'مَا هُوَ الْيَوْمُ الَّذِي يَأْتِي بَعْدَ يَوْمِ الْاِثْنَيْنِ؟', correctAnswer: 'الثُّلَاثَاءُ', options: ['الثُّلَاثَاءُ', 'الْأَحَدُ', 'الْأَرْبِعَاءُ'] },
+  { id: 3, type: DaysOfWeekExerciseType.MULTIPLE_CHOICE, prompt: 'مَا هُوَ الْيَوْمُ الَّذِي يَأْتِي قَبْلَ يَوْمِ الْجُمُعَةِ؟', correctAnswer: 'الْخَمِيسُ', options: ['الْأَرْبِعَاءُ', 'السَّبْتُ', 'الْخَمِيسُ'] },
+  { id: 4, type: DaysOfWeekExerciseType.MULTIPLE_CHOICE, prompt: 'إِذَا كَانَ الْيَوْمُ هُوَ الثُّلَاثَاءُ، فَمَاذَا سَيَكُونُ الْغَدُ؟', correctAnswer: 'الْأَرْبِعَاءُ', options: ['الْأَرْبِعَاءُ', 'الْخَمِيسُ', 'الْاِثْنَيْنِ'] },
+  { id: 5, type: DaysOfWeekExerciseType.ORDER_DRAG_DROP },
+  { id: 6, type: DaysOfWeekExerciseType.MULTIPLE_CHOICE, prompt: 'مَا هُوَ الْيَوْمُ الَّذِي يَأْتِي بَعْدَ يَوْمِ الْخَمِيسِ؟', correctAnswer: 'الْجُمُعَةُ', options: ['السَّبْتُ', 'الْأَرْبِعَاءُ', 'الْجُمُعَةُ'] },
+  { id: 7, type: DaysOfWeekExerciseType.MULTIPLE_CHOICE, prompt: 'مَا هُوَ أَوَّلُ أَيَّامِ الْأُسْبُوعِ؟', correctAnswer: 'الْاِثْنَيْنِ', options: ['الْاِثْنَيْنِ', 'الْجُمُعَةُ', 'الْأَحَدُ'] },
+  { id: 8, type: DaysOfWeekExerciseType.MULTIPLE_CHOICE, prompt: 'مَا هُوَ آخِرُ أَيَّامِ الْأُسْبُوعِ؟', correctAnswer: 'الْأَحَدُ', options: ['الْخَمِيسُ', 'السَّبْتُ', 'الْأَحَدُ'] },
+];
+
+
+// Data for "Opposites Match" game, structured into multiple exercises.
+const allOpposites: OppositesPair[] = [
+  { id: 1, word1: 'كَبِيرٌ', word2: 'صَغِيرٌ' }, { id: 2, word1: 'طَوِيلٌ', word2: 'قَصِيرٌ' },
+  { id: 3, word1: 'حَارٌّ', word2: 'بَارِدٌ' }, { id: 4, word1: 'لَيْلٌ', word2: 'نَهَارٌ' },
+  { id: 5, word1: 'فَوْقَ', word2: 'تَحْتَ' }, { id: 6, word1: 'سَرِيعٌ', word2: 'بَطِيءٌ' },
+  { id: 7, word1: 'نَظِيفٌ', word2: 'مُتَّسِخٌ' }, { id: 8, word1: 'سَعِيدٌ', word2: 'حَزِينٌ' },
+  { id: 9, word1: 'يَمِينٌ', word2: 'يَسَارٌ' }, { id: 10, word1: 'مُمْتَلِئٌ', word2: 'فَارِغٌ' },
+  { id: 11, word1: 'جَدِيدٌ', word2: 'قَدِيمٌ' }, { id: 12, word1: 'أَبْيَضُ', word2: 'أَسْوَدُ' },
+];
+
+export const oppositesExercises: OppositesExercise[] = [
+  { id: 1, type: OppositesExerciseType.CONNECT_WORDS, pairs: allOpposites.slice(0, 5) },
+  { id: 2, type: OppositesExerciseType.MULTIPLE_CHOICE, promptWord: 'سَرِيعٌ', correctAnswer: 'بَطِيءٌ', options: ['بَطِيءٌ', 'كَبِيرٌ', 'حَارٌّ'] },
+  { id: 3, type: OppositesExerciseType.FILL_IN_THE_BLANK, sentenceHint: 'الشَّمْسُ تَظْهَرُ فِي النَّهَارِ، وَالْقَمَرُ يَظْهَرُ فِي ___', correctAnswer: 'اللَّيْلِ', options: ['اللَّيْلِ', 'الصَّبَاحِ', 'الْغَابَةِ'] },
+  { id: 4, type: OppositesExerciseType.CONNECT_WORDS, pairs: allOpposites.slice(5, 10) },
+  { id: 5, type: OppositesExerciseType.MULTIPLE_CHOICE, promptWord: 'نَظِيفٌ', correctAnswer: 'مُتَّسِخٌ', options: ['جَدِيدٌ', 'فَارِغٌ', 'مُتَّسِخٌ'] },
+  { id: 6, type: OppositesExerciseType.FILL_IN_THE_BLANK, sentenceHint: 'الْفِيلُ كَبِيرٌ، لَكِنَّ الْفَأْرَ ___', correctAnswer: 'صَغِيرٌ', options: ['قَصِيرٌ', 'صَغِيرٌ', 'بَطِيءٌ'] },
+  { id: 7, type: OppositesExerciseType.CONNECT_WORDS, pairs: [allOpposites[10], allOpposites[11], allOpposites[0], allOpposites[7], allOpposites[8]] },
+  { id: 8, type: OppositesExerciseType.MULTIPLE_CHOICE, promptWord: 'فَوْقَ', correctAnswer: 'تَحْتَ', options: ['يَمِينٌ', 'تَحْتَ', 'يَسَارٌ'] },
 ];
